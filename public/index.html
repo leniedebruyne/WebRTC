@@ -1,0 +1,42 @@
+<!-- client code -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WebSocket Demo</title>
+</head>
+
+<body>
+    <h1>Mini Chat</h1>
+
+    <input id="input" placeholder="Type something..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <ul id="messages"></ul>
+
+    <!-- Socket.io client library -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+
+        socket.on("connect", () => {
+            console.log("Connected:", socket.id);
+        });
+
+        function sendMessage() {
+            const input = document.getElementById("input");
+            socket.emit("message", input.value);
+            input.value = "";
+        }
+
+        socket.on("message", (msg) => {
+            const li = document.createElement("li");
+            li.textContent = msg;
+            document.getElementById("messages").appendChild(li);
+        });
+    </script>
+</body>
+
+</html>
