@@ -1,34 +1,40 @@
 // server code
 
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Zorg dat we de public map kunnen gebruiken
-app.use(express.static("public"));
+const clients = {};
 
-// Wanneer iemand verbindt
-io.on("connection", (socket) => {
-    console.log("New connection:", socket.id);
+app.use(express.static('public')); // zorg dat index.html in /public staat
 
-    // Wanneer client iets stuurt
-    socket.on("message", (msg) => {
-        console.log("Message received:", msg);
+io.on('connection', socket => {
+    clients[socket.id] = { id: socket.id };
+    console.log('Socket connected', socket.id);
 
-        // Stuur het terug naar ALLE clients
-        io.emit("message", msg);
+    socket.on('update', (targetSocketId, data) => {
+        if (!clients[targetSocketId]) return;
+
+        // Notify desktop dat controller is connected
+        io.to(targetSocketId).emit('controller-connected');
+
+        // Stuur cursor data
+        io.to(targetSocketId).emit('update', data);
     });
 
-    socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
+    socket.on('message', msg => {
+        io.emit('message', msg); // broadcast naar iedereen
+    });
+
+    socket.on('disconnect', () => {
+        delete clients[socket.id];
     });
 });
 
-// Server starten
 server.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
+    console.log('Server running on http://localhost:3000');
 });
