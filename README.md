@@ -1,11 +1,5 @@
 # Balloon Dodger
 
-Balloon Dodger is een 1-op-1 interactieve desktop game waarbij de speler een ballon bestuurt via een smartphone.  
-De smartphone functioneert als controller en stuurt bewegingen en acties realtime door naar de desktop via een WebRTC data channel.
-
-De desktop toont de game. De smartphone verwerkt de input.
-
----
 
 ## Concept
 
@@ -19,7 +13,6 @@ De smartphone stuurt:
 
 De desktop verwerkt deze input en rendert de game state.
 
----
 
 ## Desktop
 
@@ -47,7 +40,6 @@ Achtergrondkleur: luchtblauw.
 - Botsing met een obstakel resulteert in game over.
 - De score loopt door zolang de speler niet botst.
 
----
 
 ## Smartphone Controller
 
