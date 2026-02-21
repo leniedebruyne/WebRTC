@@ -1,41 +1,52 @@
 <!-- client code, desktop -->
 
+
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>WebSocket Demo</title>
+    <title>WebRTC</title>
+    <style>
+        .cursor {
+            position: absolute;
+            width: 3rem;
+            height: 3rem;
+            background: red;
+            border-radius: 50%;
+            transition: all 0.05s linear;
+        }
+    </style>
 </head>
 
 <body>
     <div id="qrContainer">
-        <p>Scan deze QR code om te connecten:</p>
+        <p id="status">Scan QR code met je gsm</p>
         <div id="qr"></div>
         <a id="url" target="_blank"></a>
     </div>
 
-    <div id="chatContainer" style="display:none;">
-        <h1>Mini Chat</h1>
-        <input id="input" placeholder="Type iets..." />
-        <button onclick="sendMessage()">Send</button>
-        <ul id="messages"></ul>
-    </div>
-
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
     <script>
-        const $messages = document.getElementById('messages');
-        const $qrContainer = document.getElementById('qrContainer');
-        const $chatContainer = document.getElementById('chatContainer');
-        const $url = document.getElementById('url');
-
         const socket = io();
+        const $url = document.getElementById('url');
+        const $status = document.getElementById('status');
+        const $qrContainer = document.getElementById('qrContainer');
 
+        let pc = null;
+        let dataChannel = null;
+        let cursor = null;
+        let currentControllerId = null;
+
+        // QR code genereren
         socket.on('connect', () => {
-            const desktopIP = "192.168.1.32:3000"; 
+            const desktopIP = "192.168.1.32:3000";
             const url = `http://${desktopIP}/controller.html?id=${socket.id}`;
+            /* const url = `${window.location.origin}/controller.html?id=${socket.id}`; */
+
             $url.textContent = url;
-            $url.setAttribute('href', url);
+            $url.href = url;
 
             const qr = qrcode(4, 'L');
             qr.addData(url);
@@ -43,36 +54,64 @@
             document.getElementById('qr').innerHTML = qr.createImgTag(4);
         });
 
-        socket.on('controller-connected', () => {
-            $qrContainer.style.display = 'none';
-            $chatContainer.style.display = 'block';
+        // Offer ontvangen van controller
+        socket.on('webrtc-offer', async ({ controllerId, offer }) => {
+
+            currentControllerId = controllerId;
+
+            pc = new RTCPeerConnection();
+
+            pc.ondatachannel = event => {
+                dataChannel = event.channel;
+
+                dataChannel.onopen = () => {
+                    $status.textContent = "Controller connected!";
+                    $qrContainer.style.display = "none";
+                };
+
+                dataChannel.onmessage = e => {
+                    const { x, y } = JSON.parse(e.data);
+
+                    if (!cursor) {
+                        cursor = document.createElement('div');
+                        cursor.classList.add('cursor');
+                        document.body.appendChild(cursor);
+                    }
+
+                    cursor.style.left = `${x * window.innerWidth}px`;
+                    cursor.style.top = `${y * window.innerHeight}px`;
+                };
+            };
+
+            pc.onicecandidate = e => {
+                if (e.candidate) {
+                    socket.emit('webrtc-ice-candidate', {
+                        targetId: currentControllerId,
+                        candidate: e.candidate
+                    });
+                }
+            };
+
+            await pc.setRemoteDescription(offer);
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+
+            socket.emit('webrtc-answer', {
+                controllerId: currentControllerId,
+                answer
+            });
         });
 
-        socket.on('update', (data) => {
-            let $cursor = document.querySelector(`#cursor`);
-            if (!$cursor) {
-                $cursor = document.createElement(`div`);
-                $cursor.classList.add(`cursor`);
-                $cursor.setAttribute(`id`, `cursor`);
-                document.body.appendChild($cursor);
+        // ICE candidate ontvangen
+        socket.on('webrtc-ice-candidate', async ({ candidate }) => {
+            if (pc) {
+                try {
+                    await pc.addIceCandidate(candidate);
+                } catch (err) {
+                    console.error(err);
+                }
             }
-            $cursor.style.left = `${data.x * window.innerWidth}px`;
-            $cursor.style.top = `${data.y * window.innerHeight}px`;
         });
-
-        socket.on('message', msg => {
-            const li = document.createElement('li');
-            li.textContent = msg;
-            $messages.appendChild(li);
-        });
-
-        function sendMessage() {
-            const input = document.getElementById('input');
-            const msg = input.value;
-            if (!msg) return;
-            socket.emit('message', msg);
-            input.value = '';
-        }
     </script>
 </body>
 

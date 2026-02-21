@@ -1,89 +1,82 @@
+<!-- client code, gsm -->
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Socket.io Controller</title>
+    <title>Controller</title>
     <style>
-        html {
-            box-sizing: border-box;
-        }
-
-        *,
-        *:before,
-        *:after {
-            box-sizing: inherit;
-        }
-
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
-
-        .cursor {
+        #touchCursor {
             position: absolute;
-            width: 1rem;
-            height: 1rem;
-            margin-left: -.5rem;
-            margin-right: -.5rem;
-            background: red;
-            border-radius: 50% 50%;
+            width: 3rem;
+            height: 3rem;
+            background: blue;
+            border-radius: 50%;
+            pointer-events: none;
         }
     </style>
 </head>
 
 <body>
+    <h1>Controller</h1>
+    <div id="touchCursor"></div>
+
     <script src="/socket.io/socket.io.js"></script>
+
     <script>
-        {
-            const $messages = document.getElementById('messages');
+        const socket = io();
+        const desktopId = new URLSearchParams(window.location.search).get('id');
+        if (!desktopId) alert("Missing desktop ID in URL!");
 
-            let socket; // will be assigned a value later
+        const pc = new RTCPeerConnection();
+        const dataChannel = pc.createDataChannel('cursor');
 
-            const init = () => {
-                targetSocketId = getUrlParameter('id');
-                if (!targetSocketId) {
-                    alert(`Missing target ID in querystring`);
-                    return;
-                }
-                socket = io.connect('/');
-                socket.on('connect', () => {
-                    console.log(`Connected: ${socket.id}`);
+        dataChannel.onopen = () => console.log("Data channel open!");
+
+        pc.onicecandidate = e => {
+            if (e.candidate) {
+                socket.emit('webrtc-ice-candidate', {
+                    targetId: desktopId,
+                    candidate: e.candidate
                 });
-                window.addEventListener(`mousemove`, e => handleMouseMove(e));
-                window.addEventListener(`touchmove`, e => handleTouchMove(e));
-            };
+            }
+        };
 
-            const getUrlParameter = name => {
-                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-                const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-                const results = regex.exec(location.search);
-                return results === null ? false : decodeURIComponent(results[1].replace(/\+/g, ' '));
-            };
+        (async () => {
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            socket.emit('webrtc-offer', { desktopId, offer });
+        })();
 
-            const handleMouseMove = e => {
-                if (socket.connected) {
-                    socket.emit(`update`, targetSocketId, {
-                        x: e.clientX / window.innerWidth,
-                        y: e.clientY / window.innerHeight
-                    });
-                }
-            };
+        socket.on('webrtc-answer', ({ answer }) => {
+            pc.setRemoteDescription(answer);
+        });
 
-            const handleTouchMove = e => {
-                if (socket.connected) {
-                    socket.emit(`update`, targetSocketId, {
-                        x: e.touches[0].clientX / window.innerWidth,
-                        y: e.touches[0].clientY / window.innerHeight
-                    });
-                }
-            };
+        const $touchCursor = document.getElementById('touchCursor');
 
-            init();
-        }
+        const sendCursor = e => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            $touchCursor.style.left = `${e.clientX}px`;
+            $touchCursor.style.top = `${e.clientY}px`;
+
+            if (dataChannel.readyState === "open") {
+                dataChannel.send(JSON.stringify({ x, y }));
+            }
+        };
+
+        const handleTouch = e => {
+            e.preventDefault();
+            sendCursor(e.touches[0]);
+        };
+
+        window.addEventListener('mousemove', sendCursor);
+        window.addEventListener('touchstart', handleTouch, { passive: false });
+        window.addEventListener('touchmove', handleTouch, { passive: false });
     </script>
 </body>
 

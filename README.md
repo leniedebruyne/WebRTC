@@ -481,6 +481,457 @@ const url = `http://${desktopIP}/controller.html?id=${socket.id}`;
 ## QR code websockets -> webRTC
 Als ik nu met mijn gsm de qr code scan, geeft die qr code mij de link van de localhost. Dit is al goed, maar als mijn telefoon verbonden is met een ander netwerk zal dit niet werken en dat is niet de bedoeling. Daarom zal ik op zoek gaan naar een oplossing met webRTC dat je niet percee op het zelfde netwerk hoeft te zitten.
 
+### Tools die ik heb gebruikt
+- Cursor tutorial
+- Documentatie: Using WebRTC data channels
+- ai om de logica te begrijpen en toe te passen.
+
+### Eerst alles in websockets
+Omdat ik de stap te groot vond om direct een bolletje te kunnen laten bewegen met webRTC, heb ik ervoor gekozen om het eerst met webSockets te proberen, en dit in een volgende stap dan om te zetten naar webRtc.
+
+Ik heb voor de bewegende bolletjes de tutorial van de corusor gevold. Ook heb ik de logica van mijn mini chat weg gelaten. Ik weet nu namelijk dat die socket connectie goed zit.
+
+Na de tutorial van de cursor te hebben gevold is dit mijn code:
+
+
+#### index.js
+#### ai prompt
+Bekijk deze code en pas deze aan voor het gebruik van WebRTC
+
+```javascript
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+app.use(express.static('public')); 
+
+io.on('connection', socket => {
+    console.log(`User connected: ${socket.id}`);
+
+    // Controller meldt zich bij een desktop
+    socket.on('controller-connected', desktopId => {
+        console.log(`Controller ${socket.id} connected for desktop ${desktopId}`);
+        io.to(desktopId).emit('controller-connected', socket.id);
+    });
+
+    // Ontvangen van cursor updates
+    socket.on('cursor-update', ({ desktopId, x, y }) => {
+        io.to(desktopId).emit('cursor-update', { controllerId: socket.id, x, y });
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
+    });
+});
+
+server.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
+});
+```
+
+#### index.html
+#### ai prompt
+Bekijk deze code en pas deze aan voor het gebruik van WebRTC
+
+```javascript
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QR & WebRTC Demo</title>
+    <style>
+        .cursor {
+            position: absolute;
+            width: 3rem;
+            height: 3rem;
+            background: red;
+            border-radius: 50%;
+            transition: all 0.05s linear;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="qrContainer">
+        <p id="status">Scan QR code met je gsm</p>
+        <div id="qr"></div>
+        <a id="url" target="_blank"></a>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+    <script>
+        const socket = io();
+        const $qrContainer = document.getElementById('qrContainer');
+        const $url = document.getElementById('url');
+        const $status = document.getElementById('status');
+
+        let targetControllerId;
+        let cursors = {}; // controllerId => div
+
+        // QR code genereren
+        socket.on('connect', () => {
+            const desktopIP = "192.168.1.32:3000"; // pas aan
+            const url = `http://${desktopIP}/controller.html?id=${socket.id}`;
+            $url.textContent = url;
+            $url.setAttribute('href', url);
+
+            const qr = qrcode(4, 'L');
+            qr.addData(url);
+            qr.make();
+            document.getElementById('qr').innerHTML = qr.createImgTag(4);
+        });
+
+        // Controller meldt zich
+        socket.on('controller-connected', controllerId => {
+            targetControllerId = controllerId;
+            $status.textContent = "Controller connected! 🎉";
+            console.log("Controller connected:", targetControllerId);
+
+            if (!cursors[controllerId]) {
+                const $cursor = document.createElement('div');
+                $cursor.classList.add('cursor');
+                $cursor.style.left = '50px';
+                $cursor.style.top = `${$qrContainer.offsetTop + $qrContainer.offsetHeight + 20}px`;
+                document.body.appendChild($cursor);
+                cursors[controllerId] = $cursor;
+            }
+        });
+
+        // Cursor updates ontvangen
+        socket.on('cursor-update', ({ controllerId, x, y }) => {
+            let $cursor = cursors[controllerId];
+            if (!$cursor) {
+                $cursor = document.createElement('div');
+                $cursor.classList.add('cursor');
+                document.body.appendChild($cursor);
+                cursors[controllerId] = $cursor;
+            }
+            $cursor.style.left = `${x * window.innerWidth}px`;
+            $cursor.style.top = `${y * window.innerHeight}px`;
+        });
+    </script>
+</body>
+
+</html>
+```
+
+#### controller.html
+#### ai prompt
+Bekijk deze code en pas deze aan voor het gebruik van WebRTC
+
+```javascript
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controller</title>
+    <style>
+        #touchCursor {
+            position: absolute;
+            width: 3rem;
+            height: 3rem;
+            background: blue;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Controller</h1>
+    <div id="touchCursor"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+        const desktopId = new URLSearchParams(window.location.search).get('id');
+        if (!desktopId) alert("Missing desktop ID in URL!");
+
+        socket.emit('controller-connected', desktopId);
+
+        const $touchCursor = document.getElementById('touchCursor');
+
+        const sendCursor = e => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            // update eigen bolletje
+            $touchCursor.style.left = `${e.clientX}px`;
+            $touchCursor.style.top = `${e.clientY}px`;
+
+            // stuur naar desktop
+            socket.emit('cursor-update', { desktopId, x, y });
+        };
+
+        const handleTouch = e => {
+            e.preventDefault();
+            sendCursor(e.touches[0]);
+        };
+
+        window.addEventListener('mousemove', sendCursor);
+        window.addEventListener('touchstart', handleTouch, { passive: false });
+        window.addEventListener('touchmove', handleTouch, { passive: false });
+        window.addEventListener('touchend', handleTouch, { passive: false });
+        window.addEventListener('touchcancel', handleTouch, { passive: false });
+    </script>
+</body>
+
+</html>
+```
+
+Alles werkt nu goed met websockets, nu moet ik ervoor zorgen dat mijn cursor updates gebeuren met WebRTC
+
+## Nu de cursor verplaatsing met websockets veranderen naar webRTC
+### ai prompt
+Geef een stappenplan van hoe ik mijn project kan optimaliseren zodat ik websockets alleen gebruik voor signalling en webrtc voor de aansturing.
+- code van de cursor oefening
+
+### ai antwoord
+### index.js
+```javascript
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+app.use(express.static('public'));
+
+io.on('connection', socket => {
+    console.log(`User connected: ${socket.id}`);
+
+    // WebRTC signalling: offer van controller naar desktop
+    socket.on('webrtc-offer', ({ desktopId, offer }) => {
+        io.to(desktopId).emit('webrtc-offer', { controllerId: socket.id, offer });
+    });
+
+    // WebRTC signalling: answer van desktop naar controller
+    socket.on('webrtc-answer', ({ controllerId, answer }) => {
+        io.to(controllerId).emit('webrtc-answer', { answer });
+    });
+
+    // WebRTC signalling: ICE candidates
+    socket.on('webrtc-ice-candidate', ({ targetId, candidate }) => {
+        io.to(targetId).emit('webrtc-ice-candidate', { candidate });
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
+    });
+});
+
+server.listen(3000, () => console.log('Server running on http://localhost:3000'));
+```
+
+### index.html
+```javascript
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QR & WebRTC Demo</title>
+    <style>
+        .cursor {
+            position: absolute;
+            width: 3rem;
+            height: 3rem;
+            background: red;
+            border-radius: 50%;
+            transition: all 0.05s linear;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="qrContainer">
+        <p id="status">Scan QR code met je gsm</p>
+        <div id="qr"></div>
+        <a id="url" target="_blank"></a>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+    <script>
+        const socket = io();
+        const $qrContainer = document.getElementById('qrContainer');
+        const $url = document.getElementById('url');
+        const $status = document.getElementById('status');
+
+        let peers = {};       // controllerId -> RTCPeerConnection
+        let dataChannels = {}; // controllerId -> DataChannel
+        let cursors = {};     // controllerId -> div
+
+        // QR code genereren
+        socket.on('connect', () => {
+            const desktopIP = "192.168.1.32:3000"; // pas aan naar jouw lokale IP
+            const url = `http://${desktopIP}/controller.html?id=${socket.id}`;
+            $url.textContent = url;
+            $url.setAttribute('href', url);
+
+            const qr = qrcode(4, 'L');
+            qr.addData(url);
+            qr.make();
+            document.getElementById('qr').innerHTML = qr.createImgTag(4);
+        });
+
+        // Nieuwe controller meldt zich via signalling (offer)
+        socket.on('webrtc-offer', async ({ controllerId, offer }) => {
+            const pc = new RTCPeerConnection();
+            peers[controllerId] = pc;
+
+            // Data channel ontvangen van controller
+            pc.ondatachannel = event => {
+                const channel = event.channel;
+                dataChannels[controllerId] = channel;
+
+                channel.onmessage = e => {
+                    const { x, y } = JSON.parse(e.data);
+
+                    let $cursor = cursors[controllerId];
+                    if (!$cursor) {
+                        $cursor = document.createElement('div');
+                        $cursor.classList.add('cursor');
+                        document.body.appendChild($cursor);
+                        cursors[controllerId] = $cursor;
+                    }
+                    $cursor.style.left = `${x * window.innerWidth}px`;
+                    $cursor.style.top = `${y * window.innerHeight}px`;
+                };
+            };
+
+            pc.onicecandidate = e => {
+                if (e.candidate) {
+                    socket.emit('webrtc-ice-candidate', { targetId: controllerId, candidate: e.candidate });
+                }
+            };
+
+            await pc.setRemoteDescription(offer);
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+
+            socket.emit('webrtc-answer', { controllerId, answer });
+
+            $status.textContent = "Controller connected! 🎉";
+        });
+
+        // ICE candidates ontvangen
+        socket.on('webrtc-ice-candidate', ({ candidate }) => {
+            Object.values(peers).forEach(pc => {
+                pc.addIceCandidate(candidate).catch(e => console.error(e));
+            });
+        });
+    </script>
+</body>
+
+</html>
+```
+
+
+### controller.html
+
+```javascript
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controller</title>
+    <style>
+        #touchCursor {
+            position: absolute;
+            width: 3rem;
+            height: 3rem;
+            background: blue;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Controller</h1>
+    <div id="touchCursor"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const socket = io();
+        const desktopId = new URLSearchParams(window.location.search).get('id');
+        if (!desktopId) alert("Missing desktop ID in URL!");
+
+        const pc = new RTCPeerConnection();
+        const dataChannel = pc.createDataChannel('cursor');
+
+        dataChannel.onopen = () => console.log("Data channel open!");
+
+        pc.onicecandidate = e => {
+            if (e.candidate) {
+                socket.emit('webrtc-ice-candidate', { targetId: desktopId, candidate: e.candidate });
+            }
+        };
+
+        (async () => {
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            socket.emit('webrtc-offer', { desktopId, offer });
+        })();
+
+        socket.on('webrtc-answer', ({ answer }) => {
+            pc.setRemoteDescription(answer);
+        });
+
+        const $touchCursor = document.getElementById('touchCursor');
+
+        const sendCursor = e => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            $touchCursor.style.left = `${e.clientX}px`;
+            $touchCursor.style.top = `${e.clientY}px`;
+
+            if (dataChannel.readyState === "open") {
+                dataChannel.send(JSON.stringify({ x, y }));
+            }
+        };
+
+        const handleTouch = e => {
+            e.preventDefault();
+            sendCursor(e.touches[0]);
+        };
+
+        window.addEventListener('mousemove', sendCursor);
+        window.addEventListener('touchstart', handleTouch, { passive: false });
+        window.addEventListener('touchmove', handleTouch, { passive: false });
+        window.addEventListener('touchend', handleTouch, { passive: false });
+        window.addEventListener('touchcancel', handleTouch, { passive: false });
+    </script>
+</body>
+
+</html>
+```
+
+## Inzicht
+Ik vroeg AI om een stappenplan, maar kreeg eigenlijk al een volledig werkende code, zonder uitleg erbij. Maar ik stelde me tog een paar vragen bij de code. 
+- Waarom hebben we in deze code peers nodig? Ik wil niet met meerdere controllers werken. Daarom heb ik peers uit de code gehaald.
+- De code gebruikt nog altijd het IP adress voor de qr code, ik zal een oplossing moeten vinden om dit op te lossen, zodat de code niet meer afhankelijk is van het lokale ip adress. Ik had dit in de documentatie van mdn gevonden, maar weet niet zeker of dit is wat ik nodig heb. https://developer.mozilla.org/en-US/docs/Web/API/Location/origin : console.log(window.location.origin);
+
+- Waarom word er in controller.html passive false gebruikt? -> Dit gebeurd omdat je anders op de pagina kan scrollen, dit is niet handig als je het bolletje probeerd te verplaatsen.
+
+
+
 
 
 

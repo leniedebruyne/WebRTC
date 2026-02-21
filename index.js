@@ -1,5 +1,3 @@
-// server code
-
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -8,33 +6,29 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const clients = {};
-
-app.use(express.static('public')); // zorg dat index.html in /public staat
+app.use(express.static('public'));
 
 io.on('connection', socket => {
-    clients[socket.id] = { id: socket.id };
-    console.log('Socket connected', socket.id);
+    console.log(`User connected: ${socket.id}`);
 
-    socket.on('update', (targetSocketId, data) => {
-        if (!clients[targetSocketId]) return;
-
-        // Notify desktop dat controller is connected
-        io.to(targetSocketId).emit('controller-connected');
-
-        // Stuur cursor data
-        io.to(targetSocketId).emit('update', data);
+    // WebRTC signalling: offer van controller naar desktop
+    socket.on('webrtc-offer', ({ desktopId, offer }) => {
+        io.to(desktopId).emit('webrtc-offer', { controllerId: socket.id, offer });
     });
 
-    socket.on('message', msg => {
-        io.emit('message', msg); // broadcast naar iedereen
+    // WebRTC signalling: answer van desktop naar controller
+    socket.on('webrtc-answer', ({ controllerId, answer }) => {
+        io.to(controllerId).emit('webrtc-answer', { answer });
+    });
+
+    // WebRTC signalling: ICE candidates
+    socket.on('webrtc-ice-candidate', ({ targetId, candidate }) => {
+        io.to(targetId).emit('webrtc-ice-candidate', { candidate });
     });
 
     socket.on('disconnect', () => {
-        delete clients[socket.id];
+        console.log(`User disconnected: ${socket.id}`);
     });
 });
 
-server.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-});
+server.listen(3000, () => console.log('Server running on http://localhost:3000'));
