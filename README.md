@@ -1186,6 +1186,51 @@ const sendCursor = e => {
 };
 ```
 
+## html structuur
+Daarna heb ik gezorgt voor de html structuur van mijn ui. 
+### desktop
+Op mijn desktop had ik bovenaan een bar. In die bar staat de tijd die je al bezig bent aan de game en de high score die al is gemaakt. Daar onder speelt de game zich af. Je ziet geleidelijk aan wolkjes op de achtergrond verschijnen en weer verdwijnen. Ook vliegt er een vogel rond, als je deze raakt ben je af. En als laatste zie je ook nog een ballon. Deze kan je besturen met je gsm.
+
+```javascript
+<div class="game">
+        <!-- UI -->
+        <div class="hud">
+            <span class="time">Time: 00:00</span>
+            <span class="best">Best: 00:00</span>
+        </div>
+        <!-- Wolken-container -->
+        <div class="clouds"></div>
+        <!-- Ballon -->
+        <div class="balloon"> <img src="/assets/Balloon.svg" alt="balloon"> </div>
+        <!-- Vogel -->
+        <div class="bird"> <img src="/assets/Bird.png" alt="bird"> </div>
+    </div>
+```
+
+
+### phone
+Op mijn phone heb ik veel gewerkt met div's omdat deze makkelijker zijn om dan bijvoorbeeld een klik op schuif event op te zetten. Mijn eerste div bovenaan heeft de tekst "Shake for boost" en daar onder 3 bolletjes, die aantonen hoeveel boosts je al hebt gebruikt. Daar onder heb je 2 buttons die samen in een div zitten. De eerste button is om de ballon grootter te maken, de andere is om hem terug kleiner te maken. Je kan deze knoppen altijd gebruiken, maar de ballon heeft maar 3 groottes: klein, normaal of groot. Daar onder staat de laatste div, daar stata de tekst "Swipe to move" en een arrow die aangeeft dat je van links naar rechts moet swipen. Dit zal er voor zorgen dat je de ballon kan verschuiven.
+
+```javascript
+ <div class="game-ui">
+        <div class="boost-section">
+            <p class="title">Shake for boost</p>
+            <div class="indicators"> <span class="dot"></span> <span class="dot"></span> <span class="dot"></span>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn grow">Tap to grow</button>
+            <button class="btn shrink">Tap to shrink</button>
+        </div>
+        <div class="swipe-section">
+            <p>Swipe to move</p>
+            <div class="arrow"></div>
+        </div>
+    </div>
+```
+
+Ook heb ik een map toegevoegd genaamd assets, waar ik mijn images heb ingestoken.
+
 
 
 

@@ -21,7 +21,22 @@
 </head>
 
 <body>
-    <h1>Controller</h1>
+    <div class="game-ui">
+        <div class="boost-section">
+            <p class="title">Shake for boost</p>
+            <div class="indicators"> <span class="dot"></span> <span class="dot"></span> <span class="dot"></span>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn grow">Tap to grow</button>
+            <button class="btn shrink">Tap to shrink</button>
+        </div>
+        <div class="swipe-section">
+            <p>Swipe to move</p>
+            <div class="arrow"></div>
+        </div>
+    </div>
+    
     <div id="touchCursor"></div>
 
     <script src="/socket.io/socket.io.js"></script>
