@@ -1074,6 +1074,119 @@ Omdat ik wil gaan werken met de kanteling van mijn gsm, zal ik inplaats van met 
 ## goal voor volgende week
 Voor het consult van volgende week wil ik de ui klaar hebben. Ook wil ik al de basic interacties hebben (klikken, slepen, ...). Ik wil ook al eens bekeken hebben hoe de kanteling van de gsm in zijn werk zal gaan.
 
+## simple peer
+Ik ben begonnen met de feedback van simple peer toe te passen. Dit zijn de dingen die ik heb gewijzigd in mijn code:
+
+index,js:
+```javascript
+io.on('connection', socket => {
+    console.log(`User connected: ${socket.id}`);
+
+    socket.on('signal', ({ targetId, signal }) => {
+        io.to(targetId).emit('signal', {
+            senderId: socket.id,
+            signal
+        });
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
+    });
+});
+```
+
+index,html: 
+```javascript
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"></script>
+```
+
+```javascript
+let peer = null;
+let cursor = null;
+let currentControllerId = null;
+
+socket.on('signal', ({ senderId, signal }) => {
+
+    currentControllerId = senderId;
+
+    if (!peer) {
+        peer = new SimplePeer({
+            initiator: false,
+            trickle: true
+        });
+
+        peer.on('signal', data => {
+            socket.emit('signal', {
+                targetId: currentControllerId,
+                signal: data
+            });
+        });
+
+        peer.on('data', data => {
+            const { x, y } = JSON.parse(data);
+
+            if (!cursor) {
+                cursor = document.createElement('div');
+                cursor.classList.add('cursor');
+                document.body.appendChild(cursor);
+            }
+
+            cursor.style.left = `${x * window.innerWidth}px`;
+            cursor.style.top = `${y * window.innerHeight}px`;
+        });
+
+        peer.on('connect', () => {
+            $status.textContent = "Controller connected!";
+            $qrContainer.style.display = "none";
+        });
+    }
+
+    peer.signal(signal);
+});
+```
+
+controller.html: 
+```javascript
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"></script>
+```
+
+```javascript
+const peer = new SimplePeer({
+    initiator: true,
+    trickle: true
+});
+
+peer.on('signal', data => {
+    socket.emit('signal', {
+        targetId: desktopId,
+        signal: data
+    });
+});
+
+socket.on('signal', ({ signal }) => {
+    peer.signal(signal);
+});
+
+peer.on('connect', () => {
+    console.log("Data channel open!");
+});
+```
+
+```javascript
+const sendCursor = e => {
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+
+    $touchCursor.style.left = `${e.clientX}px`;
+    $touchCursor.style.top = `${e.clientY}px`;
+
+    if (peer.connected) {
+        peer.send(JSON.stringify({ x, y }));
+    }
+};
+```
+
+
 
 
 

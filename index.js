@@ -11,19 +11,11 @@ app.use(express.static('public'));
 io.on('connection', socket => {
     console.log(`User connected: ${socket.id}`);
 
-    // WebRTC signalling: offer van controller naar desktop
-    socket.on('webrtc-offer', ({ desktopId, offer }) => {
-        io.to(desktopId).emit('webrtc-offer', { controllerId: socket.id, offer });
-    });
-
-    // WebRTC signalling: answer van desktop naar controller
-    socket.on('webrtc-answer', ({ controllerId, answer }) => {
-        io.to(controllerId).emit('webrtc-answer', { answer });
-    });
-
-    // WebRTC signalling: ICE candidates
-    socket.on('webrtc-ice-candidate', ({ targetId, candidate }) => {
-        io.to(targetId).emit('webrtc-ice-candidate', { candidate });
+    socket.on('signal', ({ targetId, signal }) => {
+        io.to(targetId).emit('signal', {
+            senderId: socket.id,
+            signal
+        });
     });
 
     socket.on('disconnect', () => {
