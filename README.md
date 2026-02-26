@@ -931,6 +931,158 @@ Ik vroeg AI om een stappenplan, maar kreeg eigenlijk al een volledig werkende co
 - Waarom word er in controller.html passive false gebruikt? -> Dit gebeurd omdat je anders op de pagina kan scrollen, dit is niet handig als je het bolletje probeerd te verplaatsen.
 
 
+## Qr code zonder IP adress
+Nu werkt de QR code goed, maar hij werkt met het IP adress, het is de bedoeling dat ik met mijn gsm de QR code kan scannen en kan connecteren met mijn laptop, ookal zitten ze niet op hetzelfde wifi adress.
+
+Ik heb wat research gedaan naar hoe ik dit kan doen. Het eerste dat ik tegen kwam was een code stuk op MDN. https://developer.mozilla.org/en-US/docs/Web/API/Location/origin
+
+
+
+```javascript
+console.log(window.location.origin); // On this page returns 'https://developer.mozilla.org'
+```
+
+Ik heb dit zo in mijn code geïntegreerd:
+
+```javascript
+const url = `${window.location.origin}/controller.html?id=${socket.id}`;
+```
+Mijn localhost wou echter niet verbinden met deze integratie. Ik kreeg geen error dus wist ook niet wat er mis was, daarom heb ik het gevraagd aan ai.
+
+### ai prompt
+Ik probeer een code te integreren waar ik een QR code heb op desktop, die ik kan scannen met mijn gsm. Ik probeer een manier te vinden om deze connectie niet te maken met een IP adress, ik dacht dat ik iets had gevonden, maar mijn gsm geeft aan dat hij niet kan verbinden met deze host. Ook krijg ik geen error, wat kan er mis zijn? 
+
+### Dit zijn de oplossingen die AI gaf
+- port forwarding
+- Een TURN‑server gebruiken -> niet gratis
+- Je project online hosten
+
+Volgens mij is port forwarding de beste optie voor wat ik wil bereiken. Dit zijn de stappen die moet ondernemen in mijn code:
+https://code.visualstudio.com/docs/debugtest/port-forwarding
+
+
+#### 1. index.js
+
+```javascript
+server.listen(3000, '0.0.0.0', () => {
+  console.log("Server running on port 3000");
+});
+
+```
+#### 2. Lan-ip adress vinden
+192.168.1.32
+via deze website: https://whatismyipaddress.com/
+IPv4: 81.244.7.174
+
+#### 3. inloggen op router
+http://192.168.1.1
+
+#### 4. Zoek “Port Forwarding” of “NAT”
+
+#### 5. Maak een nieuwe port forwarding regel
+
+#### 6. Vind je publieke IP
+
+#### 7. Test of je server publiek bereikbaar is
+
+#### 8. Pas je QR‑code aan
+
+Dit is de code die ik heb toegevoegd:
+Index.js:
+```javascript
+server.listen(3000, '0.0.0.0', () => { console.log("Server running on port 3000"); });
+
+```
+
+index.html:
+
+```javascript
+            const publicIP = "81.244.7.174";
+            const url = `http://${publicIP}:3000/controller.html?id=${socket.id}`;
+
+```
+
+Maar het werkt nog niet als ik http://81.244.7.174:3000 opzoek op mijn telefoon op 4G. Daarom heb ik aan ai gevraagd wat het probleem kan zijn.
+Die zegt dat ik data moet veranderen in mijn router.
+
+Het laatste dat ik vond is ngrok, een API die dit eigenlijk zelf afhandeld. Dit zijn de stappen voor het gebruiken ervan:
+
+```javascript
+ngrok http 3000
+
+```
+
+dan krijg je een code, die je moet veranderen in je const url.
+
+-> https://subministrant-kimora-haughty.ngrok-free.dev/
+
+```javascript
+const desktopIP = "192.168.1.32:3000";
+const url = `http://${desktopIP}/controller.html?id=${socket.id}`;
+
+```
+
+->
+
+```javascript
+const url = `${window.location.origin}/controller.html?id=${socket.id}`;
+
+```
+
+en dit:
+
+```javascript
+const qr = qrcode(4, 'L');
+```
+
+->
+
+```javascript
+const qr = qrcode(0, 'L');
+```
+
+Nu werkt de qr code ook als ik die wil scannen met mijn gsm die op 4g zit. Het probleem is nu dat hij de beweging van het bolletje niet meer waarneemt.
+
+## Consult 1
+### Qr code
+In het consult werd duidelijk dat ik de QR code zonder IP wat te ver zogt, de oplossing had ik al lang gevonden, namelijk gewoon met window location werken. Dit is dus de code voor de qr code:
+
+index.js:
+```javascript
+server.listen(3000, "0.0.0.0", () => {
+    console.log("Server running on port 3000");
+});
+```
+
+index.html:
+```javascript
+const desktopIP = "192.168.1.32:3000"; 
+const url = `${window.location.origin}/controller.html?id=${socket.id}`; 
+```
+
+Nu kan ik mijn website via deze link bekijken: http://192.168.1.32:3000/
+
+### Concept
+Mijn concept werd ook goed gekeurd, wel moest ik er rekning mee houden dat mensen niet heel de tijd naar hun gsm mogen kijken, daarom zal ik niet met apparte buttons werken, maar met vlakken. Zo zal het makkelijker zijn voor de gebruiker en hoeven ze niet elke keer te kijken welke button ze moeten klikken.
+
+### Simple peer
+Ook moet ik proberen om simple peer in te voegen, dit geeft een kortere notatie weer. 
+
+### http -> https 
+Omdat ik wil gaan werken met de kanteling van mijn gsm, zal ik inplaats van met htpp moeten werken met https
+
+## goal voor volgende week
+Voor het consult van volgende week wil ik de ui klaar hebben. Ook wil ik al de basic interacties hebben (klikken, slepen, ...). Ik wil ook al eens bekeken hebben hoe de kanteling van de gsm in zijn werk zal gaan.
+
+
+
+
+
+
+
+
+
+
 
 
 
