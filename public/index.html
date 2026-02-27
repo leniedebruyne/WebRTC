@@ -77,23 +77,9 @@
 
         .bird {
             position: absolute;
-            top: 30%;
-            left: 0;
             width: 60px;
             height: auto;
-            animation: fly 6s linear infinite alternate;
-        }
-
-        @keyframes fly {
-            0% {
-                left: 0;
-                transform: scaleX(1);
-            }
-
-            100% {
-                left: 90%;
-                transform: scaleX(-1);
-            }
+            transition: transform 0.2s linear;
         }
 
         .clouds {
@@ -149,8 +135,6 @@
         <div class="clouds"></div>
         <!-- Ballon -->
         <div class="balloon"> <img src="/assets/Balloon.svg" alt="balloon"> </div>
-        <!-- Vogel -->
-        <div class="bird"> <img src="/assets/Bird.png" alt="bird"> </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -251,7 +235,6 @@
 
                     startClouds();
                     startTimer();
-                    
                 });
             }
 
