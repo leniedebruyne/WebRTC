@@ -1804,10 +1804,163 @@ Deze functie werkt goed en ik begrijp wat er allemaal gebeurd.
 
 
 ### levens logica
+Daarna was het tijd om de logica van de levens te schrijven. Ik wil dat je 3 levens hebt, die kun je zien in de top bar div. Er staan 3 gevulde hartjes, elke keer als de ballon tegen de vogel botst, verdwijnt er een hartje. Als je hartjes op zijn, stopt het spel.
+
+Als eerste heb ik mijn div aangepast, zodat er ook hartjes staan.
 
 ```javascript
-
+<div class="hud">
+    <span class="time">Time: 00:00</span>
+    <span class="best">Best time: 00:00</span>
+    <div class="lives">
+        ❤️ ❤️ ❤️
+    </div>
+</div>
 ```
+
+Dan heb ik ervoor gezorgt dat je 3 levens hebt en dat de functie aan de hartjes kan.
+
+```javascript
+let lives = 3; // start met 3 levens
+const livesContainer = document.querySelector('.hud .lives');
+```
+
+Voor de volgende stap heb ik ai zijn hulp gevraagd. Ik wist nog dat je iets moest dien met client rect maar wist niet meer precies hoe dat in zijn werk ging. Dit is de code die hij gaf:
+
+```javascript
+function animate() {
+    pos += speed * direction;
+    bird.style.left = pos + 'px';
+
+    // check collision met ballon
+    const birdRect = bird.getBoundingClientRect();
+    const balloonRect = balloon.getBoundingClientRect();
+
+    if (
+        birdRect.left < balloonRect.right &&
+        birdRect.right > balloonRect.left &&
+        birdRect.top < balloonRect.bottom &&
+        birdRect.bottom > balloonRect.top
+    ) {
+        // botsing gedetecteerd
+        bird.remove();
+        birdExists = false;
+
+        // verwijder 1 hartje
+        lives--;
+        updateLivesUI();
+
+        if (lives <= 0) {
+            endGame();
+        }
+
+        return; // stop animatie van deze vogel
+    }
+
+    // check of buiten scherm
+    if ((direction === 1 && pos > window.innerWidth + 60) ||
+        (direction === -1 && pos < -60)) {
+        bird.remove();
+        birdExists = false;
+        return;
+    }
+
+    requestAnimationFrame(animate);
+}
+```
+
+Daarna moest ik nog een fucntie maken die de hartjes opdate, voor elk leven dat er is moet er een hartje staan.
+
+```javascript
+function updateLivesUI() {
+    livesContainer.textContent = '❤️'.repeat(lives);
+}
+```
+
+Ook wil ik dat het spel stopt als er geen levens meer zijn. Nu zal ik dit nog doen met een alert, later zal ik hier een UI scherm voor maken. Ook stop ik de timer en de vogels die binnen komen.
+
+```javascript
+function endGame() {
+    alert("Game Over!");
+    clearInterval(birdInterval);
+    clearInterval(timerInterval);
+}
+```
+
+Ik had een bug waarbij dat als de ballon de vogel raakte, de hartjes nog niet weg gingen. Ik heb daarom een console.log toegevoegd. Daar kwam uit dat de levens functie nog niet verbonden was met de vogel, maar ik wist niet hoe ik dit dan moest aanpakken. Daarom heb ik wederom AI zijn hulp gevraagd hiervoor.
+
+```javascript
+function spawnBird() {
+    if (birdExists) return;
+
+    birdExists = true;
+
+    const bird = document.createElement('div');
+    bird.classList.add('bird');
+    bird.innerHTML = '<img src="/assets/Bird.png" alt="bird">';
+
+    const topPos = Math.random() * (window.innerHeight * 0.6) + window.innerHeight * 0.1;
+    bird.style.top = `${topPos}px`;
+
+    const fromLeft = Math.random() < 0.5;
+    let pos = fromLeft ? -60 : window.innerWidth + 60;
+    let direction = fromLeft ? 1 : -1;
+    bird.style.left = pos + 'px';
+    bird.style.transform = `scaleX(${fromLeft ? 1 : -1})`;
+
+    const speed = Math.random() * 3 + 1;
+
+    gameArea.appendChild(bird);
+
+    function animate() {
+    // kleine stapjes per frame
+    const step = speed * direction;
+    const steps = Math.ceil(Math.abs(step)); // aantal sub-stapjes
+
+    for (let i = 0; i < steps; i++) {
+        pos += direction; // 1px per sub-stap
+        bird.style.left = pos + 'px';
+
+        const birdRect = bird.getBoundingClientRect();
+        const balloonRect = balloon.getBoundingClientRect();
+
+        if (
+            birdRect.left < balloonRect.right &&
+            birdRect.right > balloonRect.left &&
+            birdRect.top < balloonRect.bottom &&
+            birdRect.bottom > balloonRect.top
+        ) {
+            console.log("⚠️ Botsing gedetecteerd!");
+            bird.remove();
+            birdExists = false;
+
+            lives--;
+            updateLivesUI();
+
+            if (lives <= 0) {
+                endGame();
+            }
+            return; // stop animatie
+        }
+    }
+
+    if ((direction === 1 && pos > window.innerWidth + 60) ||
+        (direction === -1 && pos < -60)) {
+        bird.remove();
+        birdExists = false;
+        return;
+    }
+
+    requestAnimationFrame(animate);
+}
+
+    animate();
+}
+```
+
+
+
+
 
 
 

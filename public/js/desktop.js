@@ -11,10 +11,15 @@ const timeEl = document.querySelector('.time');
 // vogel
 const bird = document.querySelector('.bird');
 const gameArea = document.querySelector('.game');
-let direction = 1; 
+let direction = 1;
 let speed = 2;
 let pos = 0;
 let birdExists = false;
+
+// levens
+let lives = 3;
+const livesContainer = document.querySelector('.hud .lives');
+
 
 
 
@@ -88,41 +93,66 @@ function startTimer() {
     }, 1000);
 }
 
+
 // vogel functie
 function spawnBird() {
-    if (birdExists) return; // als er al een vogel is, spawn niet
+    if (birdExists) return;
 
-    birdExists = true; // markeer dat er nu een vogel is
+    birdExists = true;
 
     const bird = document.createElement('div');
     bird.classList.add('bird');
     bird.innerHTML = '<img src="/assets/Bird.png" alt="bird">';
 
-    // Random top positie
     const topPos = Math.random() * (window.innerHeight * 0.6) + window.innerHeight * 0.1;
     bird.style.top = `${topPos}px`;
 
-    // Random kant van spawn
     const fromLeft = Math.random() < 0.5;
-
-    let pos = fromLeft ? -60 : window.innerWidth + 60; // start net buiten scherm
-    let direction = fromLeft ? 1 : -1; // richting
+    let pos = fromLeft ? -60 : window.innerWidth + 60;
+    let direction = fromLeft ? 1 : -1;
     bird.style.left = pos + 'px';
     bird.style.transform = `scaleX(${fromLeft ? 1 : -1})`;
 
-    // Random snelheid
     const speed = Math.random() * 3 + 1;
 
     gameArea.appendChild(bird);
 
     function animate() {
-        pos += speed * direction;
-        bird.style.left = pos + 'px';
+        // kleine stapjes per frame
+        const step = speed * direction;
+        const steps = Math.ceil(Math.abs(step)); // aantal sub-stapjes
+
+        for (let i = 0; i < steps; i++) {
+            pos += direction; // 1px per sub-stap
+            bird.style.left = pos + 'px';
+
+            const birdRect = bird.getBoundingClientRect();
+            const balloonRect = balloon.getBoundingClientRect();
+
+            if (
+                birdRect.left < balloonRect.right &&
+                birdRect.right > balloonRect.left &&
+                birdRect.top < balloonRect.bottom &&
+                birdRect.bottom > balloonRect.top
+            ) {
+                console.log("⚠️ Botsing gedetecteerd!");
+                bird.remove();
+                birdExists = false;
+
+                lives--;
+                updateLivesUI();
+
+                if (lives <= 0) {
+                    endGame();
+                }
+                return; // stop animatie
+            }
+        }
 
         if ((direction === 1 && pos > window.innerWidth + 60) ||
             (direction === -1 && pos < -60)) {
             bird.remove();
-            birdExists = false; // vogel is weg, kan een nieuwe spawnen
+            birdExists = false;
             return;
         }
 
@@ -132,7 +162,66 @@ function spawnBird() {
     animate();
 }
 
-// spawn vogel elke 1–5 sec, maar alleen als er geen vogel is
-setInterval(() => {
+const birdInterval = setInterval(() => {
     spawnBird();
-}, 1000); // interval check elke 1 sec, spawnBird zorgt dat er max 1 is
+}, 1000);
+
+
+
+
+// levens functie
+
+function animate() {
+    pos += speed * direction;
+    bird.style.left = pos + 'px';
+
+    // check collision met ballon
+    const birdRect = bird.getBoundingClientRect();
+    const balloonRect = balloon.getBoundingClientRect();
+
+    if (
+        birdRect.left < balloonRect.right &&
+        birdRect.right > balloonRect.left &&
+        birdRect.top < balloonRect.bottom &&
+        birdRect.bottom > balloonRect.top
+    ) {
+        console.log("⚠️ Botsing gedetecteerd!"); // <-- debug log
+        // botsing gedetecteerd
+        bird.remove();
+        birdExists = false;
+
+        // verwijder 1 hartje
+        lives--;
+        updateLivesUI();
+
+        if (lives <= 0) {
+            endGame();
+        }
+
+        return; // stop animatie van deze vogel
+    }
+
+
+    // check of buiten scherm
+    if ((direction === 1 && pos > window.innerWidth + 60) ||
+        (direction === -1 && pos < -60)) {
+        bird.remove();
+        birdExists = false;
+        return;
+    }
+
+    requestAnimationFrame(animate);
+}
+
+function updateLivesUI() {
+    livesContainer.textContent = '❤️'.repeat(lives);
+}
+
+function endGame() {
+    alert("Game Over!");
+    // Stop de vogel spawn interval
+    clearInterval(birdInterval);
+    // stop timer
+    clearInterval(timerInterval);
+}
+
