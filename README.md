@@ -1231,6 +1231,145 @@ Op mijn phone heb ik veel gewerkt met div's omdat deze makkelijker zijn om dan b
 
 Ook heb ik een map toegevoegd genaamd assets, waar ik mijn images heb ingestoken.
 
+## css
+Daarna was het tijd om de css toe te voegen.
+### Desktop
+Als eerste heb ik ervoor gezorgt dat de qr code in het midden van het scherm stond, met een achtergrondkleur. Daarna heb ik de css van de game zelf gemaakt, waar onder de achtergrond gradient, tijd bar, de ballon heb ik voor een tijdje statisch gezet, maar het is natuurlijk straks de bedoeling dat die kan bewegen. Ook heb ik een kleine animatie op de vogel gezet, die vliegt nu heen en weer, het is nog niet hoe het er moet uitzien, maar de gedachte word wel getoond. En ook voor de wolkjes heb ik een kleine animatie die later word aangevuld met javascript.
+
+```javascript
+<style>
+
+        .cursor {
+            position: absolute;
+            width: 3rem;
+            height: 3rem;
+            background: red;
+            border-radius: 50%;
+            transition: all 0.05s linear;
+        }
+
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(to top, #65A9E7, #D7ECFE);
+            font-family: 'Arial', sans-serif;
+        }
+
+        #qrContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #65A9E7;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #qrContainer p {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .game {
+            display: none;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 200px;
+            font-size: 45px;
+            color: #333;
+            background: rgba(248, 250, 254, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 10;
+        }
+
+        .balloon {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 120px;
+        }
+
+        .bird {
+            position: absolute;
+            top: 30%;
+            left: 0;
+            width: 60px;
+            height: auto;
+            animation: fly 6s linear infinite alternate;
+        }
+
+        @keyframes fly {
+            0% {
+                left: 0;
+                transform: scaleX(1);
+            }
+
+            100% {
+                left: 90%;
+                transform: scaleX(-1);
+            }
+        }
+
+        .clouds {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cloud {
+            position: absolute;
+            bottom: -150px;
+            width: 283px;
+            height: 131px;
+            pointer-events: none;
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.9;
+
+            transform-origin: bottom center;
+            transform: scale(var(--scale, 1));
+        }
+
+        @keyframes rise {
+            from {
+                transform: scale(var(--scale, 1)) translateY(0);
+            }
+
+            to {
+                transform: scale(var(--scale, 1)) translateY(-130vh);
+            }
+        }
+    </style>
+```
+
+### Phone
+Voor mijn ui van mijn phone heb ik ervoor gezorgt dat de plaatsen waarop je kunt tikken groot genoeg waren, zodat je niet elke keer hoeft te kijken. Alles van de ui is nu nog statisch, zoals ook de bolletjes van de boost, die zullen later logica krijgen.
 
 
 
@@ -1238,8 +1377,124 @@ Ook heb ik een map toegevoegd genaamd assets, waar ik mijn images heb ingestoken
 
 
 
+```javascript
+<style>
+        #touchCursor {
+            position: absolute;
+            width: 3rem;
+            height: 3rem;
+            background: blue;
+            border-radius: 50%;
+            pointer-events: none;
+        }
 
+        body {
+            background: linear-gradient(#6894d1, #1e4fbf);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: sans-serif;
+        }
 
+        .game-ui {
+            width: 300px;
+            text-align: center;
+            color: #D7ECFE;
+        }
+
+        .boost-section {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .boost-section .title {
+            font-size: 25px;
+        }
+
+        .boost-section .indicators {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: #D7ECFE;
+            opacity: 0.5;
+            border-radius: 50%;
+        }
+
+        .boost-section .dot {
+            width: 25px;
+            height: 25px;
+            background: #D7ECFE;
+            opacity: 0.5;
+            border-radius: 50%;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 35px;
+            align-items: center;
+        }
+
+        .btn {
+            width: 293px;
+            height: 150px;
+            border-radius: 20px;
+            border: none;
+            font-size: 25px;
+            cursor: pointer;
+            background: #D7ECFE;
+            color: #4174AC;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .grow {
+            font-weight: bold;
+        }
+
+        .shrink {
+            font-weight: normal;
+        }
+
+        .swipe-section {
+            width: 100vw;
+            margin-left: 50%;
+            transform: translateX(-50%);
+            margin-top: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            padding: 25px 0;
+            text-align: center;
+        }
+
+        .swipe-section p {
+            font-size: 30px;
+            margin: 0 0 15px 0;
+            color: #D7ECFE;
+        }
+
+        .arrow {
+            width: 120px;
+            height: 40px;
+            background-image: url('/assets/Arrow.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0 auto;
+        }
+    </style>
+```
 
 
 
