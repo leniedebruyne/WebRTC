@@ -127,8 +127,9 @@ function spawnBird() {
             bird.style.left = pos + 'px';
 
             const birdRect = bird.getBoundingClientRect();
-            const balloonRect = balloon.getBoundingClientRect();
 
+            const balloonImg = balloon.querySelector('img');
+            const balloonRect = balloonImg.getBoundingClientRect();
             if (
                 birdRect.left < balloonRect.right &&
                 birdRect.right > balloonRect.left &&
@@ -185,7 +186,6 @@ function animate() {
         birdRect.top < balloonRect.bottom &&
         birdRect.bottom > balloonRect.top
     ) {
-        console.log("⚠️ Botsing gedetecteerd!"); // <-- debug log
         // botsing gedetecteerd
         bird.remove();
         birdExists = false;
