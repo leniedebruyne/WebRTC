@@ -225,22 +225,27 @@
                 });
 
                 peer.on('close', () => {
-                    location.reload(); 
+                    location.reload(); // reset naar QR
                 });
 
+                // test ziek eerst de qr code en als die scant pas de ui?
                 peer.on('connect', () => {
                     $status.textContent = "Controller connected!";
                     $qrContainer.style.display = "none";
 
                     const gameDiv = document.querySelector('.game');
-                    gameDiv.style.display = "block"; // toonde game
+                    gameDiv.style.display = "block"; // show de game
 
+                    // ✅ start wolken hier
+                    startClouds();
                 });
             }
 
             peer.signal(signal);
         });
     </script>
+
+    <script src="/js/desktop.js"></script>
 
 </body>
 

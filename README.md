@@ -1496,6 +1496,71 @@ Voor mijn ui van mijn phone heb ik ervoor gezorgt dat de plaatsen waarop je kunt
     </style>
 ```
 
+## Javascript
+Voor de logica van de wolken was er ook wat javascript nodig, ik wou namelijk dat er wolken op de achtergrond bewogen, zodat het lijkt alsof het beeld omhoog beweegt. Ik wou maximum 4 wolken op mijn scherm, zodat er niet te veel waren. Ook mochten ze een verschillende scale hebben. 
+Voor deze logica heb ik ai gebruikt om te zien hoe ik de spawn van de wolken moest aanpakken.
+
+### ai
+Ik wil logica schrijven waarbij wolken om de woveel tijd spawnen, er mogen maximum 4 wolken op het scherm aanwezig zijn en de wolken mogen een verschillende scale hebben. Kun je me helpen met het schrijven van de logica?
+
+### output
+
+```javascript
+const cloudContainer = document.querySelector('.clouds');
+const maxClouds = 4;
+
+function spawnCloud() {
+    console.log("Nieuwe wolk wordt gespawnd!");
+
+    if (!cloudContainer) {
+        console.log("cloudContainer bestaat nog niet!");
+        return;
+    }
+
+    if (cloudContainer.children.length >= maxClouds) {
+        console.log("Max aantal wolken bereikt:", cloudContainer.children.length);
+        return;
+    }
+
+    const cloud = document.createElement('div');
+    cloud.classList.add('cloud');
+
+    cloud.style.backgroundImage = "url('/assets/Cloud.png')";
+    cloud.style.left = Math.random() * 80 + 10 + "vw";
+
+    const scale = Math.random() * 0.6 + 0.7;
+    cloud.style.setProperty('--scale', scale);
+    const duration = Math.random() * 10 + 8;
+    cloud.style.animation = `rise ${duration}s linear forwards`;
+
+    cloudContainer.appendChild(cloud);
+
+    console.log("Wolk toegevoegd! Totaal nu:", cloudContainer.children.length);
+
+    cloud.addEventListener('animationend', () => {
+        cloud.remove();
+        console.log("💨 Wolk verdwenen (animationend)");
+    });
+}
+
+
+// Elke 2–4 seconden een nieuwe wolk proberen spawnen
+function startClouds() {
+    if (!cloudContainer) {
+        console.log(".clouds niet gevonden!");
+        return;
+    }
+
+    console.log("Wolken-animatie gestart!");
+    setInterval(() => {
+        spawnCloud();
+    }, 2500);
+}
+```
+
+Ik vond deze code goed geschreven, het is duidelijk, het doet wat het moet doen en de console.logs zijn handig moest er iets mislopen met de wolken. 
+
+## Ballon op de plaats van het bolletje
 
 
 
