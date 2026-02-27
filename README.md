@@ -1685,6 +1685,51 @@ Dit heb ik gedaan met deze css lijn:
 opacity: 0;
 ```
 
+## Logica time indicator
+De volgende stap is om de time en best time te doen werken. Ik zal beginnen met de time, die loopt gewoon op vanaf de qr code is gescant.
+
+```javascript
+let startTime = null;
+let timerInterval = null;
+
+const timeEl = document.querySelector('.time');
+```
+
+```javascript
+function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+```
+
+```javascript
+function startTimer() {
+    startTime = Date.now();
+
+    timerInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        timeEl.textContent = `Time: ${formatTime(elapsed)}`;
+    }, 1000);
+}
+```
+
+```javascript
+startTimer();
+```
+
+## Vogel
+### Animatie 
+Nu ga ik eerst door met de animatie van de vogel en daarna ook de levens, deze logica heb ik nodig voor ik de best time kan invoegen.
+
+Voor de vogels wil ik dat er max 1 op het scherm is. Ik zal mijn rond draaiende animatie weg doen, als hij van links komt staat hij normaal, komt hij van rechts? dan flip ik hem.
+
+
+
+
+
 
 
 

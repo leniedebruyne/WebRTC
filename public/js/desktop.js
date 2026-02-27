@@ -1,5 +1,16 @@
+// wolken
+
 const cloudContainer = document.querySelector('.clouds');
 const maxClouds = 4;
+
+// time
+let startTime = null;
+let timerInterval = null;
+
+const timeEl = document.querySelector('.time');
+
+
+// wolken functie
 
 function spawnCloud() {
     console.log("Nieuwe wolk wordt gespawnd!");
@@ -48,3 +59,23 @@ function startClouds() {
         spawnCloud();
     }, 2500);
 }
+
+// time functie
+
+function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function startTimer() {
+    startTime = Date.now();
+
+    timerInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        timeEl.textContent = `Time: ${formatTime(elapsed)}`;
+    }, 1000);
+}
+

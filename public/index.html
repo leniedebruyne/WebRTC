@@ -143,7 +143,7 @@
         <!-- UI -->
         <div class="hud">
             <span class="time">Time: 00:00</span>
-            <span class="best">Best: 00:00</span>
+            <span class="best">Best time: 00:00</span>
         </div>
         <!-- Wolken-container -->
         <div class="clouds"></div>
@@ -249,8 +249,9 @@
                     const gameDiv = document.querySelector('.game');
                     gameDiv.style.display = "block"; // show de game
 
-                    // ✅ start wolken hier
                     startClouds();
+                    startTimer();
+                    
                 });
             }
 
