@@ -71,9 +71,6 @@
 
         .balloon {
             position: absolute;
-            bottom: 20%;
-            left: 50%;
-            transform: translateX(-50%);
             width: 80px;
             height: 120px;
         }
@@ -209,14 +206,20 @@
                 peer.on('data', data => {
                     const { x, y } = JSON.parse(data);
 
-                    if (!cursor) {
-                        cursor = document.createElement('div');
-                        cursor.classList.add('cursor');
-                        document.body.appendChild(cursor);
-                    }
+                    const balloon = document.querySelector('.balloon');
 
-                    cursor.style.left = `${x * window.innerWidth}px`;
-                    cursor.style.top = `${y * window.innerHeight}px`;
+                    const screenWidth = window.innerWidth;
+                    const screenHeight = window.innerHeight;
+
+                    const balloonWidth = balloon.offsetWidth;
+                    const balloonHeight = balloon.offsetHeight;
+
+                    // Zet ballonpositie gebaseerd op normalized x/y van phone
+                    const newX = x * screenWidth - balloonWidth / 2;
+                    const newY = y * screenHeight - balloonHeight / 2;
+
+                    balloon.style.left = `${newX}px`;
+                    balloon.style.top = `${newY}px`;
                 });
 
                 peer.on('connect', () => {

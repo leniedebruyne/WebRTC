@@ -1560,8 +1560,49 @@ function startClouds() {
 
 Ik vond deze code goed geschreven, het is duidelijk, het doet wat het moet doen en de console.logs zijn handig moest er iets mislopen met de wolken. 
 
-## Ballon op de plaats van het bolletje
+## Ballon swipe logica
+### Ballon op de plaats van het bolletje
+Nu wil ik inplaats dat ik een bolletje zie bewegen op mijn desktop, dat ik de ballon kan bewegen. Daarvoor moet ik een beetje logica veranderen in mijn peer.on functie. Ik zal de ballon mee geven met een queryselector, zodat de functie aan de ballon kan om die te bewegen. De if statement heb ik niet meer nodig, omdat de ballon nu wel al bestaat in mijn html. 
 
+```javascript
+peer.on('data', data => {
+    const { x, y } = JSON.parse(data);
+
+    const balloon = document.querySelector('.balloon');
+
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    const balloonWidth = balloon.offsetWidth;
+    const balloonHeight = balloon.offsetHeight;
+
+    // Zet ballonpositie gebaseerd op normalized x/y van phone
+    const newX = x * screenWidth - balloonWidth / 2;
+    const newY = y * screenHeight - balloonHeight / 2;
+
+    balloon.style.left = `${newX}px`;
+    balloon.style.top = `${newY}px`;
+});
+```
+
+
+Ook heb ik de css een klein beetje vereenvoudigd, zodat deze de javascript niet kan overschrijven.
+
+```javascript
+.balloon {
+    position: absolute;
+    width: 80px;
+    height: 120px;
+}
+```
+
+### Alleen swipen in de bijhorende div
+Nu kun je de ballon besturen via de gsm, maar dit kan nog over heel de gsm. Ik wil dat je alleen kunt swipen in het gebied die daarvoor dient.
+
+
+```javascript
+
+```
 
 
 
