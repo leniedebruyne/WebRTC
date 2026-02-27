@@ -168,6 +168,9 @@
         let cursor = null;
         let currentControllerId = null;
 
+        const balloon = document.querySelector('.balloon');
+
+
         // QR genereren wanneer desktop connect
         socket.on('connect', () => {
 
@@ -202,11 +205,16 @@
                     });
                 });
 
+
+
+
+                // 1x initial position
+                balloon.style.left = `${window.innerWidth / 2 - balloon.offsetWidth / 2}px`;
+                balloon.style.top = `${window.innerHeight / 2 - balloon.offsetHeight / 2}px`;
+
                 // Wanneer data binnenkomt (cursor)
                 peer.on('data', data => {
                     const { x, y } = JSON.parse(data);
-
-                    const balloon = document.querySelector('.balloon');
 
                     const screenWidth = window.innerWidth;
                     const screenHeight = window.innerHeight;
@@ -214,12 +222,14 @@
                     const balloonWidth = balloon.offsetWidth;
                     const balloonHeight = balloon.offsetHeight;
 
-                    // Zet ballonpositie gebaseerd op normalized x/y van phone
                     const newX = x * screenWidth - balloonWidth / 2;
                     const newY = y * screenHeight - balloonHeight / 2;
 
-                    balloon.style.left = `${newX}px`;
-                    balloon.style.top = `${newY}px`;
+                    const clampedX = Math.max(0, Math.min(screenWidth - balloonWidth, newX));
+                    const clampedY = Math.max(0, Math.min(screenHeight - balloonHeight, newY));
+
+                    balloon.style.left = `${clampedX}px`;
+                    balloon.style.top = `${clampedY}px`;
                 });
 
                 peer.on('connect', () => {

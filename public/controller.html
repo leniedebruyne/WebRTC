@@ -16,6 +16,7 @@
             background: blue;
             border-radius: 50%;
             pointer-events: none;
+            opacity: 0;
         }
 
         body {
@@ -152,6 +153,8 @@
         const socket = io();
         const desktopId = new URLSearchParams(window.location.search).get('id');
 
+        const swipeSection = document.querySelector('.swipe-section');
+
         if (!desktopId) {
             alert("Missing desktop ID in URL!");
         }
@@ -183,11 +186,27 @@
 
         // Cursor sturen
         const sendCursor = e => {
-            const x = e.clientX / window.innerWidth;
-            const y = e.clientY / window.innerHeight;
+            const rect = swipeSection.getBoundingClientRect();
 
-            $touchCursor.style.left = `${e.clientX}px`;
-            $touchCursor.style.top = `${e.clientY}px`;
+            const localX = e.clientX - rect.left;
+            const localY = e.clientY - rect.top;
+
+            // Check of we binnen de swipe-section zitten
+            if (
+                localX < 0 ||
+                localY < 0 ||
+                localX > rect.width ||
+                localY > rect.height
+            ) {
+                return;
+            }
+
+            const x = localX / rect.width;
+            const y = localY / rect.height;
+
+            // Visuele blauwe bol
+            $touchCursor.style.left = `${rect.left + localX}px`;
+            $touchCursor.style.top = `${rect.top + localY}px`;
 
             if (peer.connected) {
                 peer.send(JSON.stringify({ x, y }));
@@ -199,9 +218,9 @@
             sendCursor(e.touches[0]);
         };
 
-        window.addEventListener('mousemove', sendCursor);
-        window.addEventListener('touchstart', handleTouch, { passive: false });
-        window.addEventListener('touchmove', handleTouch, { passive: false });
+        swipeSection.addEventListener('mousemove', sendCursor);
+        swipeSection.addEventListener('touchstart', handleTouch, { passive: false });
+        swipeSection.addEventListener('touchmove', handleTouch, { passive: false });
     </script>
 
 </body>

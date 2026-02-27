@@ -1599,10 +1599,92 @@ Ook heb ik de css een klein beetje vereenvoudigd, zodat deze de javascript niet 
 ### Alleen swipen in de bijhorende div
 Nu kun je de ballon besturen via de gsm, maar dit kan nog over heel de gsm. Ik wil dat je alleen kunt swipen in het gebied die daarvoor dient.
 
+Nu luister ik nog naar de beweging op heel het scherm, dat is het eerste dat ik zal veranderen. Als eerste zal ik de div selecteren waarin de swipe mag gebeuren.
 
 ```javascript
+const swipeSection = document.querySelector('.swipe-section');
 
 ```
+
+Nu kan ik geen window.innerWidth meer gebruiken, maar .swipe-section, ook heb ik ai gevraagd hoe ik kan checken of het nog binnen de swipe section zit. ZO heb ik dit aangepast:
+
+```javascript
+const sendCursor = e => {
+    const rect = swipeSection.getBoundingClientRect();
+
+    const localX = e.clientX - rect.left;
+    const localY = e.clientY - rect.top;
+
+    // Check of we binnen de swipe-section zitten
+    if (
+        localX < 0 || 
+        localY < 0 || 
+        localX > rect.width || 
+        localY > rect.height
+    ) {
+        return;
+    }
+
+    const x = localX / rect.width;
+    const y = localY / rect.height;
+
+    $touchCursor.style.left = `${e.clientX}px`;
+    $touchCursor.style.top = `${e.clientY}px`;
+
+    if (peer.connected) {
+        peer.send(JSON.stringify({ x, y }));
+    }
+};
+
+```
+
+Ook bij mijn eventListeners kon ik geen window.addEventListener gebruiken, ik moest nu ook swipeSection.addEventListener doen.
+
+
+```javascript
+swipeSection.addEventListener('mousemove', sendCursor);
+swipeSection.addEventListener('touchstart', handleTouch, { passive: false });
+swipeSection.addEventListener('touchmove', handleTouch, { passive: false });
+```
+
+Daarna zat ik wat vast met mij logica. Je kunt nu inderdaad alleen in die div swipen, maar als de qr code net opent, spawnt de ballon nog bovenaan het scherm, de ballon volgde de bal ook nog niet. Daarom heb ik even de hulp van ai gevraagd, om te kijken wat het probleem is.
+
+Als eerste heb ik de touchCursor plaats veranderd, zodat hij niet meer bovenaan begint.
+
+```javascript
+$touchCursor.style.left = `${rect.left + localX}px`;
+$touchCursor.style.top = `${rect.top + localY}px`;
+```
+
+Ook heb ik de ballon een startpositie gegeven.
+
+```javascript
+const balloon = document.querySelector('.balloon');
+
+balloon.style.left = `${window.innerWidth / 2}px`;
+balloon.style.top = `${window.innerHeight / 2}px`;
+```
+
+Als laatste heb ik ervoor gezorgt dat de ballon niet uit het scherm gaat.
+
+```javascript
+const clampedX = Math.max(0, Math.min(screenWidth - balloonWidth, newX));
+const clampedY = Math.max(0, Math.min(screenHeight - balloonHeight, newY));
+
+balloon.style.left = `${clampedX}px`;
+balloon.style.top = `${clampedY}px`;
+
+```
+Dankzei deze aanpassingen gaat mijn ballon nu mee met mijn beweging, en kun je alleen maar swipen in het vak. 
+
+### balletje op phone onzichtbaar maken
+Als laatste wil ik dat je het balletje op phone niet meer ziet, maar dat het wel blijft bestaan. Dit heb ik zo aangepakt.
+Dit heb ik gedaan met deze css lijn: 
+
+```javascript
+opacity: 0;
+```
+
 
 
 
