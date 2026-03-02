@@ -184,6 +184,7 @@
             console.log("Controller connected to desktop");
         });
 
+        // swipe
         // Cursor sturen
         const sendCursor = e => {
             const rect = swipeSection.getBoundingClientRect();
@@ -221,6 +222,27 @@
         swipeSection.addEventListener('mousemove', sendCursor);
         swipeSection.addEventListener('touchstart', handleTouch, { passive: false });
         swipeSection.addEventListener('touchmove', handleTouch, { passive: false });
+
+        // grow
+        const growBtn = document.querySelector('.grow');
+
+        growBtn.addEventListener('click', () => {
+            if (peer.connected) {
+                peer.send(JSON.stringify({ type: 'grow' }));
+            }
+        });
+
+        // shrink
+        const shrinkBtn = document.querySelector('.shrink');
+
+        shrinkBtn.addEventListener('click', () => {
+            if (peer.connected) {
+                peer.send(JSON.stringify({ type: 'shrink' }));
+            }
+        });
+
+
+
     </script>
 
 </body>

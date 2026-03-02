@@ -77,6 +77,7 @@
         .balloon {
             position: absolute;
             width: 100px;
+            transition: transform 0.4s ease;
         }
 
         .bird {
@@ -203,22 +204,19 @@
 
                 // Wanneer data binnenkomt (cursor)
                 peer.on('data', data => {
-                    const { x, y } = JSON.parse(data);
+                    const message = JSON.parse(data);
 
-                    const screenWidth = window.innerWidth;
-                    const screenHeight = window.innerHeight;
+                    if (message.x !== undefined && message.y !== undefined) {
+                        handleMovement(message.x, message.y);
+                    }
 
-                    const balloonWidth = balloon.offsetWidth;
-                    const balloonHeight = balloon.offsetHeight;
+                    if (message.type === 'grow') {
+                        activateGrow();
+                    }
 
-                    const newX = x * screenWidth - balloonWidth / 2;
-                    const newY = y * screenHeight - balloonHeight / 2;
-
-                    const clampedX = Math.max(0, Math.min(screenWidth - balloonWidth, newX));
-                    const clampedY = Math.max(0, Math.min(screenHeight - balloonHeight, newY));
-
-                    balloon.style.left = `${clampedX}px`;
-                    balloon.style.top = `${clampedY}px`;
+                    if (message.type === 'shrink') {
+                        activateShrink();
+                    }
                 });
 
                 peer.on('connect', () => {
@@ -240,6 +238,24 @@
                     startClouds();
                     startTimer();
                 });
+
+
+                function handleMovement(x, y) {
+                    const screenWidth = window.innerWidth;
+                    const screenHeight = window.innerHeight;
+
+                    const balloonWidth = balloon.offsetWidth;
+                    const balloonHeight = balloon.offsetHeight;
+
+                    const newX = x * screenWidth - balloonWidth / 2;
+                    const newY = y * screenHeight - balloonHeight / 2;
+
+                    const clampedX = Math.max(0, Math.min(screenWidth - balloonWidth, newX));
+                    const clampedY = Math.max(0, Math.min(screenHeight - balloonHeight, newY));
+
+                    balloon.style.left = `${clampedX}px`;
+                    balloon.style.top = `${clampedY}px`;
+                }
             }
 
             peer.signal(signal);

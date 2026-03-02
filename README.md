@@ -2001,6 +2001,117 @@ function endGame() {
 
 ```
 
+## grow button
+Hierna is het de bedoeling dat je de ballon kan doen groeien en krimpen. Als de ballon groot is, gaat de tijd wat trager, als de ballon klein is, gaat het sneller.
+Ik heb dit zo aangepakt:
+
+Eerst pak ik de grow button met de query selector.
+
+```javascript
+const growBtn = document.querySelector('.grow');
+```
+
+Daarna moest ik een manier vinden om ervoor te zorgen dat de receiver iets met grow kan doen. Daar zat ik wat vast, dus heb ik AI om hulp gevraagd. Dit is de uitkomst:
+
+```javascript
+growBtn.addEventListener('click', () => {
+    if (peer.connected) {
+        peer.send(JSON.stringify({ type: 'grow' }));
+    }
+});
+```
+
+Ook kan ik nu inplaats van alleen maar schuiven, meerdere soorten data krijgen. Daarom heb ik mijn peer on wat moeten veranderen.
+
+```javascript
+peer.on('data', data => {
+    const message = JSON.parse(data);
+
+    // Cursor movement
+    if (message.x !== undefined && message.y !== undefined) {
+        handleMovement(message.x, message.y);
+    }
+
+    // Grow action
+    if (message.type === 'grow') {
+        toggleGrow();
+    }
+});
+```
+
+En ook mijn handlemovement heb ik wat moeten veranderen hierdoor.
+
+```javascript
+function handleMovement(x, y) {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    const balloonWidth = balloon.offsetWidth;
+    const balloonHeight = balloon.offsetHeight;
+
+    const newX = x * screenWidth - balloonWidth / 2;
+    const newY = y * screenHeight - balloonHeight / 2;
+
+    const clampedX = Math.max(0, Math.min(screenWidth - balloonWidth, newX));
+    const clampedY = Math.max(0, Math.min(screenHeight - balloonHeight, newY));
+
+    balloon.style.left = `${clampedX}px`;
+    balloon.style.top = `${clampedY}px`;
+}
+```
+
+Daarna kon ik zelf terug verder met de logica. Het eerste wat ik moest doen is de ballon groter maken als er op de knop word geklikt.
+
+
+```javascript
+let balloonScale = 1;
+let speedMultiplier = 1;
+let isBoosted = false;
+```
+
+```javascript
+function toggleGrow() {
+    if (!isBoosted) {
+        // BOOST AAN
+        balloonScale = 1.8;     
+        speedMultiplier = 0.3; 
+        isBoosted = true;
+    } else {
+        // BOOST UIT
+        balloonScale = 1;
+        speedMultiplier = 1;
+        isBoosted = false;
+    }
+
+    balloon.style.transform = `scale(${balloonScale})`;
+}
+```
+
+Ook wou ik dat alles trager leek te gaan, daarom heb ik ervoor gezorgt dat de wolken en vogels trager gaan als de button actief is.
+
+### vogels
+
+```javascript
+let baseSpeed = Math.random() * 3 + 1;
+```
+
+```javascript
+const step = baseSpeed * speedMultiplier * direction;
+```
+
+### wolken
+
+```javascript
+const duration = Math.random() * 10 + 8;
+```
+
+```javascript
+const duration = (Math.random() * 10 + 8) / speedMultiplier;
+```
+
+Hetzelfde heb ik gedaan voor de kleine button, maar dan met omgekeerde logica.
+
+
 
 
 

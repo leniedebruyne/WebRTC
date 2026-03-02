@@ -23,6 +23,11 @@ const livesContainer = document.querySelector('.hud .lives');
 const bestEl = document.querySelector('.best');
 let bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
 
+// grow
+let balloonScale = 1;
+let speedMultiplier = 1;
+let currentMode = "normal";
+
 
 
 
@@ -50,7 +55,9 @@ function spawnCloud() {
 
     const scale = Math.random() * 0.6 + 0.7;
     cloud.style.setProperty('--scale', scale);
-    const duration = Math.random() * 10 + 8;
+    const duration = (Math.random() * 10 + 8) / speedMultiplier;
+
+
     cloud.style.animation = `rise ${duration}s linear forwards`;
 
     cloudContainer.appendChild(cloud);
@@ -116,17 +123,17 @@ function spawnBird() {
     bird.style.left = pos + 'px';
     bird.style.transform = `scaleX(${fromLeft ? 1 : -1})`;
 
-    const speed = Math.random() * 3 + 1;
+    let baseSpeed = Math.random() * 3 + 1;
 
     gameArea.appendChild(bird);
 
     function animate() {
         // kleine stapjes per frame
-        const step = speed * direction;
-        const steps = Math.ceil(Math.abs(step)); // aantal sub-stapjes
+        const step = baseSpeed * speedMultiplier * direction;
+        const steps = Math.ceil(Math.abs(step));
 
         for (let i = 0; i < steps; i++) {
-            pos += direction; // 1px per sub-stap
+            pos += direction; 
             bird.style.left = pos + 'px';
 
             const birdRect = bird.getBoundingClientRect();
@@ -229,6 +236,47 @@ function updateBestTimeUI() {
         bestEl.textContent = `Best time: 00:00`;
     }
 }
+
+// grow
+function activateGrow() {
+    if (currentMode === "grow") {
+        // terug naar normaal
+        setNormalMode();
+        return;
+    }
+
+    balloonScale = 1.8;
+    speedMultiplier = 0.3;
+    currentMode = "grow";
+
+    balloon.style.transform = `scale(${balloonScale})`;
+}
+
+// shrink
+function activateShrink() {
+    if (currentMode === "shrink") {
+        // terug naar normaal
+        setNormalMode();
+        return;
+    }
+
+    balloonScale = 0.6;
+    speedMultiplier = 1.8; 
+    currentMode = "shrink";
+
+    balloon.style.transform = `scale(${balloonScale})`;
+}
+
+// normal
+function setNormalMode() {
+    balloonScale = 1;
+    speedMultiplier = 1;
+    currentMode = "normal";
+
+    balloon.style.transform = `scale(${balloonScale})`;
+}
+
+
 
 // einde spel
 function endGame() {
