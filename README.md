@@ -1958,6 +1958,52 @@ function spawnBird() {
 }
 ```
 
+## Best score
+Daarna heb ik een klein beetje logica geschreven voor de beste score te kunnen bijhouden. Ik heb dit gedaan met LocalStorage.
+
+Eerst heb ik het element met de class .best geselecteerd met een queryselector, dan heb ik er ook voor gezorgt dat de beste tijd uit de localstorage gehaald kan worden.
+
+```javascript
+const bestEl = document.querySelector('.best');
+let bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
+```
+
+Daarna heb ik een klein beetje logica geschreven, die de best time update.
+```javascript
+
+function updateBestTimeUI() {
+    if (bestTime > 0) {
+        bestEl.textContent = `Best time: ${formatTime(bestTime)}`;
+    } else {
+        bestEl.textContent = `Best time: 00:00`;
+    }
+}
+```
+
+Ook heb ik de endgame functie wat aangepast, zodat de besttime word geüpdate als het spel eindigd.
+
+```javascript
+function endGame() {
+    clearInterval(birdInterval);
+    clearInterval(timerInterval);
+
+    const finalTime = Date.now() - startTime;
+
+    if (finalTime > bestTime) {
+        bestTime = finalTime;
+        localStorage.setItem('bestTime', bestTime);
+    }
+
+    updateBestTimeUI();
+
+    alert("Game Over!");
+}
+
+```
+
+
+
+
 
 
 

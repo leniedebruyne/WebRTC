@@ -1,5 +1,4 @@
 // wolken
-
 const cloudContainer = document.querySelector('.clouds');
 const maxClouds = 4;
 
@@ -19,6 +18,10 @@ let birdExists = false;
 // levens
 let lives = 3;
 const livesContainer = document.querySelector('.hud .lives');
+
+// best time
+const bestEl = document.querySelector('.best');
+let bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
 
 
 
@@ -217,11 +220,38 @@ function updateLivesUI() {
     livesContainer.textContent = '❤️'.repeat(lives);
 }
 
-function endGame() {
-    alert("Game Over!");
-    // Stop de vogel spawn interval
-    clearInterval(birdInterval);
-    // stop timer
-    clearInterval(timerInterval);
+
+// best time
+function updateBestTimeUI() {
+    if (bestTime > 0) {
+        bestEl.textContent = `Best time: ${formatTime(bestTime)}`;
+    } else {
+        bestEl.textContent = `Best time: 00:00`;
+    }
 }
 
+// einde spel
+function endGame() {
+    clearInterval(birdInterval);
+    clearInterval(timerInterval);
+
+    const finalTime = Date.now() - startTime;
+
+    if (finalTime > bestTime) {
+        bestTime = finalTime;
+        localStorage.setItem('bestTime', bestTime);
+    }
+
+    updateBestTimeUI();
+
+    alert("Game Over!");
+}
+
+
+function initGame() {
+    updateBestTimeUI();
+    updateLivesUI();
+}
+
+
+initGame();
