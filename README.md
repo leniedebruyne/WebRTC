@@ -2111,6 +2111,30 @@ const duration = (Math.random() * 10 + 8) / speedMultiplier;
 
 Hetzelfde heb ik gedaan voor de kleine button, maar dan met omgekeerde logica.
 
+## Moeilijkheid spel
+Het spel is nu nog wat te makkelijk, daarom zal ik in dit stuk meer vogels toevoegen.
+
+### Meer vogels
+
+```javascript
+function spawnRandomBirds() {
+    const currentBirds = gameArea.querySelectorAll('.bird').length;
+    const targetBirds = Math.floor(Math.random() * 3) + 1; // 1, 2 of 3
+    const maxToSpawn = targetBirds - currentBirds;
+
+    if (maxToSpawn <= 0) return; // al genoeg vogels
+
+    for (let i = 0; i < maxToSpawn; i++) {
+        spawnBird();
+    }
+}
+```
+
+### Code opschonen
+Ook heb ik een opschoninn van mijn code gedaan. Soms staan er nu functies in functies, omdat ik alles bij elkaar wou houden om te testen of de code werkte en om alles makkelijk terug te vinden om aan te passen maar dit is niet hoe het moet staan. Aangezien dat alles tot nu toe werkt, zal ik deze code al wat opschonen.
+
+
+
 
 
 

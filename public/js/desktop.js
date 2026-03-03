@@ -30,8 +30,6 @@ let currentMode = "normal";
 
 
 
-
-
 // wolken functie
 
 function spawnCloud() {
@@ -70,8 +68,6 @@ function spawnCloud() {
     });
 }
 
-
-// Elke 2–4 seconden een nieuwe wolk proberen spawnen
 function startClouds() {
     if (!cloudContainer) {
         console.log(".clouds niet gevonden!");
@@ -83,6 +79,8 @@ function startClouds() {
         spawnCloud();
     }, 2500);
 }
+
+
 
 // time functie
 
@@ -104,12 +102,34 @@ function startTimer() {
 }
 
 
+
+// best time
+function updateBestTimeUI() {
+    if (bestTime > 0) {
+        bestEl.textContent = `Best time: ${formatTime(bestTime)}`;
+    } else {
+        bestEl.textContent = `Best time: 00:00`;
+    }
+}
+
+
+
 // vogel functie
+
+function spawnRandomBirds() {
+    const currentBirds = gameArea.querySelectorAll('.bird').length;
+    const maxToSpawn = 3 - currentBirds;
+
+    if (maxToSpawn <= 0) return; // al 3 vogels aanwezig
+
+    const count = Math.min(Math.floor(Math.random() * 3) + 1, maxToSpawn);
+
+    for (let i = 0; i < count; i++) {
+        spawnBird();
+    }
+}
+
 function spawnBird() {
-    if (birdExists) return;
-
-    birdExists = true;
-
     const bird = document.createElement('div');
     bird.classList.add('bird');
     bird.innerHTML = '<img src="/assets/Bird.png" alt="bird">';
@@ -128,42 +148,30 @@ function spawnBird() {
     gameArea.appendChild(bird);
 
     function animate() {
-        // kleine stapjes per frame
-        const step = baseSpeed * speedMultiplier * direction;
-        const steps = Math.ceil(Math.abs(step));
+        pos += baseSpeed * speedMultiplier * direction;
+        bird.style.left = pos + 'px';
 
-        for (let i = 0; i < steps; i++) {
-            pos += direction; 
-            bird.style.left = pos + 'px';
+        const birdRect = bird.getBoundingClientRect();
+        const balloonRect = balloon.getBoundingClientRect();
 
-            const birdRect = bird.getBoundingClientRect();
-
-            const balloonImg = balloon.querySelector('img');
-            const balloonRect = balloonImg.getBoundingClientRect();
-            if (
-                birdRect.left < balloonRect.right &&
-                birdRect.right > balloonRect.left &&
-                birdRect.top < balloonRect.bottom &&
-                birdRect.bottom > balloonRect.top
-            ) {
-                console.log("⚠️ Botsing gedetecteerd!");
-                bird.remove();
-                birdExists = false;
-
-                lives--;
-                updateLivesUI();
-
-                if (lives <= 0) {
-                    endGame();
-                }
-                return; // stop animatie
-            }
+        if (
+            birdRect.left < balloonRect.right &&
+            birdRect.right > balloonRect.left &&
+            birdRect.top < balloonRect.bottom &&
+            birdRect.bottom > balloonRect.top
+        ) {
+            // botsing
+            bird.remove();
+            lives--;
+            updateLivesUI();
+            if (lives <= 0) endGame();
+            return;
         }
 
+        // check buiten scherm
         if ((direction === 1 && pos > window.innerWidth + 60) ||
             (direction === -1 && pos < -60)) {
             bird.remove();
-            birdExists = false;
             return;
         }
 
@@ -173,10 +181,11 @@ function spawnBird() {
     animate();
 }
 
-const birdInterval = setInterval(() => {
-    spawnBird();
-}, 1000);
-
+function startBirdSpawn() {
+    birdInterval = setInterval(() => {
+        spawnRandomBirds();
+    }, 2000);
+}
 
 
 
@@ -220,7 +229,7 @@ function animate() {
         return;
     }
 
-    requestAnimationFrame(animate);
+     requestAnimationFrame(animate); 
 }
 
 function updateLivesUI() {
@@ -228,14 +237,6 @@ function updateLivesUI() {
 }
 
 
-// best time
-function updateBestTimeUI() {
-    if (bestTime > 0) {
-        bestEl.textContent = `Best time: ${formatTime(bestTime)}`;
-    } else {
-        bestEl.textContent = `Best time: 00:00`;
-    }
-}
 
 // grow
 function activateGrow() {
@@ -252,6 +253,8 @@ function activateGrow() {
     balloon.style.transform = `scale(${balloonScale})`;
 }
 
+
+
 // shrink
 function activateShrink() {
     if (currentMode === "shrink") {
@@ -261,11 +264,13 @@ function activateShrink() {
     }
 
     balloonScale = 0.6;
-    speedMultiplier = 1.8; 
+    speedMultiplier = 1.8;
     currentMode = "shrink";
 
     balloon.style.transform = `scale(${balloonScale})`;
 }
+
+
 
 // normal
 function setNormalMode() {
@@ -296,10 +301,11 @@ function endGame() {
 }
 
 
-function initGame() {
+function init() {
+    startBirdSpawn();
     updateBestTimeUI();
     updateLivesUI();
-}
+    }
 
 
-initGame();
+init();
