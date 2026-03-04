@@ -19,6 +19,10 @@ let birdExists = false;
 let lives = 3;
 const livesContainer = document.querySelector('.hud .lives');
 
+// game over flag
+let gameOver = false;
+
+
 // best time
 const bestEl = document.querySelector('.best');
 let bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
@@ -168,6 +172,22 @@ function spawnBird() {
             return;
         }
 
+        if (!gameOver) {
+            if (
+                birdRect.left < balloonRect.right &&
+                birdRect.right > balloonRect.left &&
+                birdRect.top < balloonRect.bottom &&
+                birdRect.bottom > balloonRect.top
+            ) {
+                // botsing
+                bird.remove();
+                lives--;
+                updateLivesUI();
+                if (lives <= 0) endGame();
+                return;
+            }
+        }
+
         // check buiten scherm
         if ((direction === 1 && pos > window.innerWidth + 60) ||
             (direction === -1 && pos < -60)) {
@@ -282,23 +302,64 @@ function setNormalMode() {
 }
 
 
+// Einde spel knop
+function showRestartButton() {
+    if (document.querySelector('#restartBtn')) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'restartBtn';
+    btn.textContent = 'Speel opnieuw';
+    btn.style.position = 'absolute';
+    btn.style.top = '50%';
+    btn.style.left = '50%';
+    btn.style.transform = 'translate(-50%, -50%)';
+    btn.style.padding = '20px 40px';
+    btn.style.fontSize = '2rem';
+    btn.style.borderRadius = '15px';
+    btn.style.border = 'none';
+    btn.style.background = '#65A9E7';
+    btn.style.color = '#fff';
+    btn.style.cursor = 'pointer';
+    btn.style.zIndex = 100;
+
+    document.body.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+        btn.remove();  
+        resetGame();    
+    });
+}
+
 
 // einde spel
 function endGame() {
-    clearInterval(birdInterval);
     clearInterval(timerInterval);
+    balloon.style.display = 'none';
 
     const finalTime = Date.now() - startTime;
-
     if (finalTime > bestTime) {
         bestTime = finalTime;
         localStorage.setItem('bestTime', bestTime);
     }
-
     updateBestTimeUI();
 
-    alert("Game Over!");
+    gameOver = true; 
+
+    showRestartButton();
 }
+
+// reset spel
+function resetGame() {
+    lives = 3;
+    updateLivesUI();
+
+    balloon.style.display = 'block';
+    setNormalMode();
+
+    gameOver = false; 
+    startTimer();
+}
+
 
 
 function init() {

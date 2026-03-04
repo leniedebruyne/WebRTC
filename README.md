@@ -2137,6 +2137,107 @@ Ook heb ik een opschoninn van mijn code gedaan. Soms staan er nu functies in fun
 Omdat ik met de kanteling van mijn gsm wil werken om een boost te geven, zal ik moeten werken met https. Daarom heb ik het hoofdstukje security van guthub gevolgd om dit te kunnen doen.
 Dit is nu de link om mijn project te bekijken: https://192.168.1.32:3000/
 
+## Eind scherm
+Tot nu toe krijg je gewoon een alert als het spel gedaan is, en moet je helemaal opnieuw de qr code gaan scannen om het spel opnieuw te starten. Dit wil ik gaan aanpassen door een eindscherm met een button toe te voegen, die direct het spel herstart.
+
+Als eerste heb ik de functie bijgewerkt die het spel stopt. Ik heb ervoor gezorgt dat de ballon niet meer zichbaar is. En dat er geen botsingen meer kunnen gebeuren tussen de ballon en vogels.
+
+```javascript
+function endGame() {
+    clearInterval(timerInterval);
+    balloon.style.display = 'none';
+
+    const finalTime = Date.now() - startTime;
+    if (finalTime > bestTime) {
+        bestTime = finalTime;
+        localStorage.setItem('bestTime', bestTime);
+    }
+    updateBestTimeUI();
+
+    gameOver = true; 
+
+    showRestartButton();
+}
+```
+Daarna heb ik bij de animatie functie van de vogels toegevoegd dat als er minder dan 0 levens zijn, de functie end game mag beginnen.
+
+```javascript
+     if (!gameOver) {
+            if (
+                birdRect.left < balloonRect.right &&
+                birdRect.right > balloonRect.left &&
+                birdRect.top < balloonRect.bottom &&
+                birdRect.bottom > balloonRect.top
+            ) {
+                // botsing
+                bird.remove();
+                lives--;
+                updateLivesUI();
+                if (lives <= 0) endGame();
+                return;
+            }
+        }
+```
+Daarna heb ik ook een resetgame functie gemaakt die je opnieuw 3 levens geeft, de ballon terug zichbaar zet en de botsingen opnieuw actief maakt.
+
+```javascript
+function resetGame() {
+    lives = 3;
+    updateLivesUI();
+
+    balloon.style.display = 'block';
+    setNormalMode();
+
+    gameOver = false; 
+    startTimer();
+}
+```
+
+Als laatste heb ik ook een button functie gemaakt, die een button toont als het spel voorbij is. Ik heb de keuze gemaakt om de styling van de button in javascript te doen, omdat ik de controle wou over wanneer ik hem toonde en wanneer niet. Het zou meer werk geweest zijn in css om hem niet te tonen als het spel gaat en wel te tonen als het spel gedaan is.
+
+```javascript
+function showRestartButton() {
+    if (document.querySelector('#restartBtn')) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'restartBtn';
+    btn.textContent = 'Speel opnieuw';
+    btn.style.position = 'absolute';
+    btn.style.top = '50%';
+    btn.style.left = '50%';
+    btn.style.transform = 'translate(-50%, -50%)';
+    btn.style.padding = '20px 40px';
+    btn.style.fontSize = '2rem';
+    btn.style.borderRadius = '15px';
+    btn.style.border = 'none';
+    btn.style.background = '#65A9E7';
+    btn.style.color = '#fff';
+    btn.style.cursor = 'pointer';
+    btn.style.zIndex = 100;
+
+    document.body.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+        btn.remove();  
+        resetGame();    
+    });
+}
+```
+
+
+## Boost
+Nu wil ik verder met het maken van een boost. Het is de bedoeling dat de gebruiker de gsm kan kantelen, en dat zo de ballon sneller lijkt te gaan. In werkelijkheid zal ik juist de omgeving sneller moeten laten bewegen. 
+
+Omdat ik niet direct wist hoe ik hier aan moest beginnen, heb ik wat documentatie opgezogt op MDN:
+https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent
+
+Daar heb ik geleerd hoe ik acces kan vragen en met die data iets kan doen.
+
+Ook heb ik deze kleine tutorial gekeken:
+https://www.youtube.com/watch?v=fMDuFoqSQfw
+
+Daar kon ik deze theorie in de praktijk zien om dan te veranderen naar mijn eigen logica.
+
 
 
 

@@ -11,10 +11,8 @@ const options = {
     cert: fs.readFileSync('./localhost.crt')
 };
 
-// ✅ Eerst server maken
 const server = https.createServer(options, app);
 
-// ✅ DAN pas socket.io koppelen
 const io = new Server(server);
 
 app.use(express.static('public'));
