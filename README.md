@@ -2130,8 +2130,13 @@ function spawnRandomBirds() {
 }
 ```
 
-### Code opschonen
+## Code opschonen
 Ook heb ik een opschoninn van mijn code gedaan. Soms staan er nu functies in functies, omdat ik alles bij elkaar wou houden om te testen of de code werkte en om alles makkelijk terug te vinden om aan te passen maar dit is niet hoe het moet staan. Aangezien dat alles tot nu toe werkt, zal ik deze code al wat opschonen.
+
+## http -> https
+Omdat ik met de kanteling van mijn gsm wil werken om een boost te geven, zal ik moeten werken met https. Daarom heb ik het hoofdstukje security van guthub gevolgd om dit te kunnen doen.
+Dit is nu de link om mijn project te bekijken: https://192.168.1.32:3000/
+
 
 
 

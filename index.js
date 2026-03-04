@@ -1,9 +1,20 @@
 const express = require('express');
-const http = require('http');
+const https = require('https');
 const { Server } = require('socket.io');
+const fs = require('fs');
 
 const app = express();
-const server = http.createServer(app);
+
+// SSL opties
+const options = {
+    key: fs.readFileSync('./localhost.key'),
+    cert: fs.readFileSync('./localhost.crt')
+};
+
+// ✅ Eerst server maken
+const server = https.createServer(options, app);
+
+// ✅ DAN pas socket.io koppelen
 const io = new Server(server);
 
 app.use(express.static('public'));
@@ -23,7 +34,6 @@ io.on('connection', socket => {
     });
 });
 
-
 server.listen(3000, "0.0.0.0", () => {
-    console.log("Server running on port 3000");
+    console.log("HTTPS Server running on port 3000");
 });
