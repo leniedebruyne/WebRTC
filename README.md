@@ -2238,6 +2238,23 @@ https://www.youtube.com/watch?v=fMDuFoqSQfw
 
 Daar kon ik deze theorie in de praktijk zien om dan te veranderen naar mijn eigen logica.
 
+## Planning
+Voor volgende week wil ik graag nog meer research doen in het bewegen van de gsm en hoe ik die data kan gebruiken. Ook wil ik graag mijn game nog wat meer optimaliseren en de logica van de boost toevoegen.
+
+## Consult 2
+### Feedback spel
+Als het spel afgelopen is, komt er nu een button in beeld waar je op kan klikken om het spel opnieuw te starten. Het zou een bere performance zijn om het spel met een timer opnieuw te herstarten en als er iemand connect (dus de qr code heeft gescant), dan met een afteller het spel begint. 
+
+### Technische feedback
+Alle javascript en css moet uit de index en controller. Dit zal de bestanden overzichtelijker maken, ik kan dit doen met script type modul en dan importeren en exporteren. 
+
+Ook moet ik bij mijn swipe logica ook met een type werken, dit maakt het consistener.
+
+Bij mijn grow en shrink logica is het beter om met een else if te werken, zodat de code niet heel de tijd opnieuw uitgevoerd moet worden. 
+
+
+## Boost
+
 
 
 

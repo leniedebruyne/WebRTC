@@ -210,7 +210,11 @@
             $touchCursor.style.top = `${rect.top + localY}px`;
 
             if (peer.connected) {
-                peer.send(JSON.stringify({ x, y }));
+                peer.send(JSON.stringify({
+                    type: 'move',
+                    x: x,
+                    y: y
+                }));
             }
         };
 

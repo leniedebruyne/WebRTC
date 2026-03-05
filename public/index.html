@@ -206,15 +206,13 @@
                 peer.on('data', data => {
                     const message = JSON.parse(data);
 
-                    if (message.x !== undefined && message.y !== undefined) {
+                    if (message.type === 'move') {
                         handleMovement(message.x, message.y);
                     }
 
                     if (message.type === 'grow') {
                         activateGrow();
-                    }
-
-                    if (message.type === 'shrink') {
+                    } else if (message.type === 'shrink') {
                         activateShrink();
                     }
                 });
