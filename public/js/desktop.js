@@ -75,14 +75,8 @@ socket.on('signal', ({ senderId, signal }) => {
             $qrContainer.style.display = "none";
         });
 
-        /*                 peer.on('close', () => {
-location.reload(); // reset naar QR
-                        }); */
-
-
-        // probeersel
         socket.on('controllerDisconnected', () => {
-            location.reload();
+            resetToQR();
         });
 
         peer.on('connect', () => {
@@ -117,3 +111,21 @@ location.reload(); // reset naar QR
 
     peer.signal(signal);
 });
+
+
+// reset bij disconnect
+function resetToQR() {
+    const gameDiv = document.querySelector('.game');
+    gameDiv.style.display = "none";
+
+    balloon.style.left = `${window.innerWidth / 2 - balloon.offsetWidth / 2}px`;
+    balloon.style.top = `${window.innerHeight / 2 - balloon.offsetHeight / 2}px`;
+
+    $qrContainer.style.display = "flex";
+    $status.textContent = "Scan QR code met je gsm";
+
+    if (peer) {
+        peer.destroy();
+        peer = null;
+    }
+}

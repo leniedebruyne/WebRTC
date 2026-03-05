@@ -32,6 +32,7 @@ socket.on('signal', ({ signal }) => {
 
 peer.on('connect', () => {
     console.log("Controller connected to desktop");
+    socket.emit('registerController', desktopId);
 });
 
 

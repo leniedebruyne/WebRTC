@@ -21,21 +21,21 @@ io.on('connection', socket => {
     console.log(`User connected: ${socket.id}`);
 
     socket.on('signal', ({ targetId, signal }) => {
-        io.to(targetId).emit('signal', {
-            senderId: socket.id,
-            signal
-        });
+        io.to(targetId).emit('signal', { senderId: socket.id, signal });
     });
 
     socket.on('disconnect', () => {
         console.log(`User disconnected: ${socket.id}`);
+        if (socket.controllerFor) {
+            io.to(socket.controllerFor).emit('controllerDisconnected');
+        }
     });
 
-    // probeersel
-    socket.on('controllerDisconnected', desktopId => {
-        io.to(desktopId).emit('controllerDisconnected');
+    socket.on('registerController', desktopId => {
+        socket.controllerFor = desktopId;
     });
 });
+
 
 server.listen(3000, "0.0.0.0", () => {
     console.log("HTTPS Server running on port 3000");
