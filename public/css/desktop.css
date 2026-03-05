@@ -1,0 +1,115 @@
+.cursor {
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    background: red;
+    border-radius: 50%;
+    transition: all 0.05s linear;
+}
+
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: linear-gradient(to top, #65A9E7, #D7ECFE);
+    font-family: 'Arial', sans-serif;
+}
+
+#qrContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #65A9E7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#qrContainer p {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.game {
+    display: none;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 200px;
+    font-size: 45px;
+    color: #333;
+    background: rgba(248, 250, 254, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10;
+}
+
+.balloon img {
+    width: 100%;
+    height: auto;
+}
+
+.balloon {
+    position: absolute;
+    width: 100px;
+    transition: transform 0.4s ease;
+}
+
+.bird {
+    position: absolute;
+    width: 60px;
+    height: auto;
+    transition: transform 0.2s linear;
+}
+
+.clouds {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cloud {
+    position: absolute;
+    bottom: -150px;
+    width: 283px;
+    height: 131px;
+    pointer-events: none;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.9;
+
+    transform-origin: bottom center;
+    transform: scale(var(--scale, 1));
+}
+
+@keyframes rise {
+    from {
+        transform: scale(var(--scale, 1)) translateY(0);
+    }
+
+    to {
+        transform: scale(var(--scale, 1)) translateY(-130vh);
+    }
+}
+

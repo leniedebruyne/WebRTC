@@ -30,6 +30,11 @@ io.on('connection', socket => {
     socket.on('disconnect', () => {
         console.log(`User disconnected: ${socket.id}`);
     });
+
+    // probeersel
+    socket.on('controllerDisconnected', desktopId => {
+        io.to(desktopId).emit('controllerDisconnected');
+    });
 });
 
 server.listen(3000, "0.0.0.0", () => {

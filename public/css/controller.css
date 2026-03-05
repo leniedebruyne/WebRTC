@@ -1,0 +1,115 @@
+#touchCursor {
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    background: blue;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+}
+
+body {
+    background: linear-gradient(#6894d1, #1e4fbf);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-family: sans-serif;
+}
+
+.game-ui {
+    width: 300px;
+    text-align: center;
+    color: #D7ECFE;
+}
+
+.boost-section {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.boost-section .title {
+    font-size: 25px;
+}
+
+.boost-section .indicators {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    background: #D7ECFE;
+    opacity: 0.5;
+    border-radius: 50%;
+}
+
+.boost-section .dot {
+    width: 25px;
+    height: 25px;
+    background: #D7ECFE;
+    opacity: 0.5;
+    border-radius: 50%;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 35px;
+    align-items: center;
+}
+
+.btn {
+    width: 293px;
+    height: 150px;
+    border-radius: 20px;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+    background: #D7ECFE;
+    color: #4174AC;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.grow {
+    font-weight: bold;
+}
+
+.shrink {
+    font-weight: normal;
+}
+
+.swipe-section {
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-top: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    padding: 25px 0;
+    text-align: center;
+}
+
+.swipe-section p {
+    font-size: 30px;
+    margin: 0 0 15px 0;
+    color: #D7ECFE;
+}
+
+.arrow {
+    width: 120px;
+    height: 40px;
+    background-image: url('/assets/Arrow.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0 auto;
+}
