@@ -59,6 +59,11 @@ socket.on('signal', ({ senderId, signal }) => {
         peer.on('data', data => {
             const message = JSON.parse(data);
 
+            if (message.type === "start") {
+                resetGame();
+                startTimer();
+            }
+
             if (message.type === 'move') {
                 handleMovement(message.x, message.y);
             }
@@ -87,7 +92,7 @@ socket.on('signal', ({ senderId, signal }) => {
             gameDiv.style.display = "block"; // show de game
 
             startClouds();
-            startTimer();
+            /* startTimer(); */
         });
 
 

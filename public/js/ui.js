@@ -280,44 +280,53 @@ function setNormalMode() {
 
 
 // einde spel
-function showRestartButton() {
-    if (document.querySelector('#restartBtn')) return;
+function startCountdown() {
+    let count = 3;
 
-    const btn = document.createElement('button');
-    btn.id = 'restartBtn';
-    btn.textContent = 'Speel opnieuw';
+    const container = document.createElement('div');
+    container.id = "countdownContainer";
 
-    btn.style.position = 'absolute';
-    btn.style.top = '50%';
-    btn.style.left = '50%';
-    btn.style.transform = 'translate(-50%, -50%)';
-    btn.style.padding = '20px 40px';
-    btn.style.fontSize = '2rem';
-    btn.style.borderRadius = '15px';
-    btn.style.border = 'none';
-    btn.style.background = '#65A9E7';
-    btn.style.color = '#fff';
-    btn.style.cursor = 'pointer';
-    btn.style.zIndex = 100;
+    container.style.position = "absolute";
+    container.style.top = "50%";
+    container.style.left = "50%";
+    container.style.transform = "translate(-50%, -50%)";
+    container.style.textAlign = "center";
+    container.style.zIndex = 100;
+    container.style.color = "#fff";
+    container.style.fontSize = "3rem";
 
-    document.body.appendChild(btn);
+    container.textContent = `Reset in ${count}...`;
+    document.body.appendChild(container);
 
-    btn.addEventListener('click', () => {
-        btn.remove();
-        resetGame();
-    });
+    const interval = setInterval(() => {
+        count--;
+        if (count <= 0) {
+            clearInterval(interval);
+            container.remove();
+            resetGame();  
+            startTimer(); 
+        } else {
+            container.textContent = `Reset in ${count}...`;
+        }
+    }, 1000);
 }
 
+
 function resetGame() {
+
     lives = 3;
     updateLivesUI();
 
     balloon.style.display = 'block';
+
     setNormalMode();
 
     gameOver = false;
 
-    startTimer();
+    timeEl.textContent = "Time: 00:00";
+
+    clearInterval(timerInterval);
+
 }
 
 function endGame() {
@@ -336,7 +345,7 @@ function endGame() {
 
     gameOver = true;
 
-    showRestartButton();
+    startCountdown(); 
 }
 
 

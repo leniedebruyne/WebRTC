@@ -5,6 +5,10 @@ const desktopId = new URLSearchParams(window.location.search).get('id');
 
 const swipeSection = document.querySelector('.swipe-section');
 
+const startScreen = document.getElementById("startScreen");
+
+let gameStarted = false;
+
 if (!desktopId) {
     alert("Missing desktop ID in URL!");
 }
@@ -35,8 +39,7 @@ peer.on('connect', () => {
     socket.emit('registerController', desktopId);
 });
 
-
-// probeersel
+// Wanneer desktop disconnect
 window.addEventListener('beforeunload', () => {
     socket.emit('controllerDisconnected', desktopId);
 });
@@ -49,6 +52,16 @@ const sendCursor = e => {
 
     const localX = e.clientX - rect.left;
     const localY = e.clientY - rect.top;
+
+    if (!gameStarted) {
+        gameStarted = true;
+
+        if (peer.connected) {
+            peer.send(JSON.stringify({
+                type: "start"
+            }));
+        }
+    }
 
     // Check of we binnen de swipe-section zitten
     if (
@@ -102,3 +115,5 @@ shrinkBtn.addEventListener('click', () => {
         peer.send(JSON.stringify({ type: 'shrink' }));
     }
 });
+
+

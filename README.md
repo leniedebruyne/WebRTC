@@ -2246,11 +2246,202 @@ Voor volgende week wil ik graag nog meer research doen in het bewegen van de gsm
 Als het spel afgelopen is, komt er nu een button in beeld waar je op kan klikken om het spel opnieuw te starten. Het zou een bere performance zijn om het spel met een timer opnieuw te herstarten en als er iemand connect (dus de qr code heeft gescant), dan met een afteller het spel begint. 
 
 ### Technische feedback
+#### Javascript en css in apparte bestanden
 Alle javascript en css moet uit de index en controller. Dit zal de bestanden overzichtelijker maken, ik kan dit doen met script type modul en dan importeren en exporteren. 
 
+#### Swipe logica een type geven
+
 Ook moet ik bij mijn swipe logica ook met een type werken, dit maakt het consistener.
+```javascript
+        peer.on('data', data => {
+            const message = JSON.parse(data);
+
+            if (message.type === 'move') {
+                handleMovement(message.x, message.y);
+            }
+
+            if (message.type === 'grow') {
+                activateGrow();
+            } else if (message.type === 'shrink') {
+                activateShrink();
+            }
+        });
+```
+
+#### Else if logica bij grow en shrink
 
 Bij mijn grow en shrink logica is het beter om met een else if te werken, zodat de code niet heel de tijd opnieuw uitgevoerd moet worden. 
+
+```javascript
+        peer.on('data', data => {
+            const message = JSON.parse(data);
+
+            if (message.type === 'move') {
+                handleMovement(message.x, message.y);
+            }
+
+            if (message.type === 'grow') {
+                activateGrow();
+            } else if (message.type === 'shrink') {
+                activateShrink();
+            }
+        });
+```
+
+#### Connectie verbroken -> opnieuw qr code scherm
+
+
+Als de connectie word verbroken, moet het scherm terug resetten naar de qr code.
+Als eerste had ik een code nodig die een event kan sturen als de gsm weg gaat.
+
+```javascript
+window.addEventListener('beforeunload', () => {
+    socket.emit('controllerDisconnected', desktopId);
+});
+```
+
+Dan heb ik een code nodig in mijn controller die een functie aanroept als dat gebeurd.
+
+```javascript
+        socket.on('controllerDisconnected', () => {
+            resetToQR();
+        });
+```
+
+En dit is de functie die hij aanroept:
+
+
+```javascript
+function resetToQR() {
+    const gameDiv = document.querySelector('.game');
+    gameDiv.style.display = "none";
+
+    balloon.style.left = `${window.innerWidth / 2 - balloon.offsetWidth / 2}px`;
+    balloon.style.top = `${window.innerHeight / 2 - balloon.offsetHeight / 2}px`;
+
+    $qrContainer.style.display = "flex";
+    $status.textContent = "Scan QR code met je gsm";
+
+    if (peer) {
+        peer.destroy();
+        peer = null;
+    }
+}
+```
+
+#### inplaats van een button als het spel eindigd, een afteller. Daarna word je terug naar het begin van het spel gestuurd.
+Het is de bedoeling dat als het spel eindigd, je terug word gestuurd naar het begin van het spel met een timer die aftelt. Zo moet je niet elke keer op een button klikken om door te gaan.
+
+Ik heb de functie showRestartButton verwijderd en aan ai gevraagd hoe ik de aftel counter best kan aanpakken. Hij gaf me deze code:
+
+
+```javascript
+function startCountdown() {
+    let count = 3;
+
+    const countdownEl = document.createElement('div');
+    countdownEl.id = "countdown";
+
+    countdownEl.style.position = "absolute";
+    countdownEl.style.top = "50%";
+    countdownEl.style.left = "50%";
+    countdownEl.style.transform = "translate(-50%, -50%)";
+    countdownEl.style.fontSize = "6rem";
+    countdownEl.style.fontWeight = "bold";
+    countdownEl.style.color = "#fff";
+    countdownEl.style.zIndex = 100;
+
+    document.body.appendChild(countdownEl);
+
+    countdownEl.textContent = count;
+
+    const interval = setInterval(() => {
+        count--;
+
+        if (count <= 0) {
+            clearInterval(interval);
+            countdownEl.remove();
+
+            resetGame(); // start opnieuw
+        } else {
+            countdownEl.textContent = count;
+        }
+    }, 1000);
+}
+```
+
+Deze functie moest ik dan aanroepen in mijn endGame functie en ook moest ik er voor zorgen dat het spel pas starte als je een swipe deed.
+
+
+```javascript
+let gameStarted = false;
+
+const sendCursor = e => {
+
+    if (!gameStarted) {
+        gameStarted = true;
+
+        if (peer.connected) {
+            peer.send(JSON.stringify({
+                type: "start"
+            }));
+        }
+    }
+}
+
+```
+
+##### Kritische bedenking
+Deze ui voelde voor mij nog niet goed aan, op het einde van een spel was er een timer die aftelde, maar er stond geen uitleg wat die timer deed. Als je dan terug gezet was naar het begin, stond er geen uitleg dat je moest swipen om het spel te starten. 
+
+Ik heb er nu voor gezorgt dat als de timer ten einde was, het spel direct opnieuw begon. Later zal ik misschien nog logica toevoegen dat je iets moet doen voor het spel opnieuw start.
+
+```javascript
+
+if (message.type === "start") {
+resetGame();
+startTimer();
+}
+
+```
+
+```javascript
+
+function startCountdown() {
+    let count = 3;
+
+    const container = document.createElement('div');
+    container.id = "countdownContainer";
+
+    container.style.position = "absolute";
+    container.style.top = "50%";
+    container.style.left = "50%";
+    container.style.transform = "translate(-50%, -50%)";
+    container.style.textAlign = "center";
+    container.style.zIndex = 100;
+    container.style.color = "#fff";
+    container.style.fontSize = "3rem";
+
+    container.textContent = `Reset in ${count}...`;
+    document.body.appendChild(container);
+
+    const interval = setInterval(() => {
+        count--;
+        if (count <= 0) {
+            clearInterval(interval);
+            container.remove();
+            resetGame();  
+            startTimer(); 
+        } else {
+            container.textContent = `Reset in ${count}...`;
+        }
+    }, 1000);
+}
+
+```
+
+
+
 
 
 ## Boost
