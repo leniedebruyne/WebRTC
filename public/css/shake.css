@@ -1,0 +1,23 @@
+.permission-screen {
+    position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+    
+    #enableMotion {
+        font-size: 2rem;
+        padding: 20px 40px;
+        border-radius: 20px;
+        background: #65A9E7;
+        color: white;
+        border: none;
+        font-weight: bold;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        transform: scale(1);
+        transition: 0.2s ease;
+    }
+    

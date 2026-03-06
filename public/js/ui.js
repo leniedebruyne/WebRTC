@@ -303,8 +303,8 @@ function startCountdown() {
         if (count <= 0) {
             clearInterval(interval);
             container.remove();
-            resetGame();  
-            startTimer(); 
+            resetGame();
+            startTimer();
         } else {
             container.textContent = `Reset in ${count}...`;
         }
@@ -345,7 +345,7 @@ function endGame() {
 
     gameOver = true;
 
-    startCountdown(); 
+    startCountdown();
 }
 
 

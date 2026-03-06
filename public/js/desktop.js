@@ -14,6 +14,7 @@ let currentControllerId = null;
 const balloon = document.querySelector('.balloon');
 
 
+
 // QR genereren wanneer desktop connect
 socket.on('connect', () => {
 
@@ -59,9 +60,22 @@ socket.on('signal', ({ senderId, signal }) => {
         peer.on('data', data => {
             const message = JSON.parse(data);
 
+            if (message.type === "motionReady") {
+                document.getElementById("waitingPermission").style.display = "none";
+
+                const gameDiv = document.querySelector('.game');
+                gameDiv.style.display = "block";
+
+                startClouds();
+            }
+
             if (message.type === "start") {
                 resetGame();
                 startTimer();
+            }
+
+            if (message.type === "shake") {
+                console.log("SHAKE ontvangen van controller!");
             }
 
             if (message.type === 'move') {
@@ -75,11 +89,6 @@ socket.on('signal', ({ senderId, signal }) => {
             }
         });
 
-        peer.on('connect', () => {
-            $status.textContent = "Controller connected!";
-            $qrContainer.style.display = "none";
-        });
-
         socket.on('controllerDisconnected', () => {
             resetToQR();
         });
@@ -88,12 +97,9 @@ socket.on('signal', ({ senderId, signal }) => {
             $status.textContent = "Controller connected!";
             $qrContainer.style.display = "none";
 
-            const gameDiv = document.querySelector('.game');
-            gameDiv.style.display = "block"; // show de game
-
-            startClouds();
-            /* startTimer(); */
+            document.getElementById("waitingPermission").style.display = "flex";
         });
+
 
 
         function handleMovement(x, y) {

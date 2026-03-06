@@ -2441,10 +2441,217 @@ function startCountdown() {
 ```
 
 
-
-
-
 ## Boost
+Nu ga ik verder met de logica van de boost, het is de bedoeling dat je je gsm kan kantelen om je ballon een boost te geven. je hebt max 3 boosts die je in het spel kan gebruiken. Je kan zien hoeveel boosts je hebt door de bolletjes op de gsm ui. 
+
+Aangezien dat het moet lijken alsof de ballon sneller gaat, moet eigenlijk de rest sneller gaan, dus de vogels en wolken.
+
+### Motion log
+Als eerste wou ik beginnen met een log te krijgen als ik mijn gsm schudde. Ik wilde eerst, voordat de ui van mijn gsm zichtbaar was, een button hebben staan die je moest aanklikken op toegang te geven tot schud informatie. Ik had gelezen in de documentatie dat dit moet vanaf ios 13.
+
+Daarom heb ik al eerste een div toegveoegd met de button er in.
+
+```javascript
+
+<div id="motionPermission" class="permission-screen">
+    <button id="enableMotion">Enable motion</button>
+</div>
+
+```
+
+Ik heb die vlug wat css gegeven, later zal ik deze knop mooier maken.
+
+```javascript
+
+.permission-screen {
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+```
+
+Daarna wist ik even niet meer hoe ik verder moest. Ik heb dus ai gebruikt.
+
+#### AI 
+##### Prompt
+Hoe kan ik permission logica schrijven voor toegang te krijgen tot de data van het schudden van een gsm? Ik heb al een div gemaakt met een button waar je op kan klikken om dan toegang te geven. 
+
+##### Code die ai heeft gegeven
+
+```javascript
+
+// --- MOTION PERMISSION FLOW ---
+const permissionScreen = document.getElementById("motionPermission");
+const enableMotionBtn = document.getElementById("enableMotion");
+
+enableMotionBtn.addEventListener("click", async () => {
+
+    if (typeof DeviceMotionEvent !== "undefined" &&
+        typeof DeviceMotionEvent.requestPermission === "function") {
+
+        const res = await DeviceMotionEvent.requestPermission();
+        if (res !== "granted") {
+            alert("Motion permission is nodig om te shakken!");
+            return;
+        }
+    }
+
+    startShakeDetection();
+
+    permissionScreen.style.display = "none";
+
+    if (peer.connected) {
+        peer.send(JSON.stringify({ type: "motionReady" }));
+    }
+});
+```
+
+
+
+```javascript
+
+.permission-screen {
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+```
+
+
+```javascript
+
+let lastShake = 0;
+
+function startShakeDetection() {
+    window.addEventListener("devicemotion", (e) => {
+        const acc = e.accelerationIncludingGravity;
+        if (!acc) return;
+
+        const strength = Math.abs(acc.x) + Math.abs(acc.y) + Math.abs(acc.z);
+
+        if (strength > 35) {
+            const now = Date.now();
+            if (now - lastShake > 800) {
+                lastShake = now;
+
+                if (peer.connected) {
+                    peer.send(JSON.stringify({ type: "shake" }));
+                }
+            }
+        }
+    });
+}
+
+```
+
+```javascript
+
+if (message.type === "motionReady") {
+                console.log("Motion permission granted — game mag starten!");
+
+                const gameDiv = document.querySelector('.game');
+                gameDiv.style.display = "block";
+
+                startClouds();
+            }
+
+```
+
+```javascript
+            if (message.type === "shake") {
+                console.log("SHAKE ontvangen van controller!");
+            }
+
+```
+
+#### Reflectie
+Ik ben blij dat ik wat hulp heb gekregen want zelf was ik er waarschijnlijk niet uitgekomen. Ik vond de code van het toegang vragen best moeilijk te begrijpen.
+
+Wat ik wel nog ga veranderen is de logica van de shake in een appart js bestand zetten. Anders staat er te veel logica door elkaar, en het zal nodig zijn voor de volgende stappen om het appart te houden. Daarom heb ik de functies motion permission en shake detection in een appart js bestand gezet.
+Ook heb ik een appart css bestand gemaakt voor shake.
+
+Ik heb de button een andere css gegeven zodat hij meer opvalt.
+
+```javascript
+#enableMotion {
+    font-size: 2rem;
+    padding: 20px 40px;
+    border-radius: 20px;
+    background: #65A9E7;
+    color: white;
+    border: none;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    transform: scale(1);
+    transition: 0.2s ease;
+}
+
+```
+
+Tot nu toe was er en wit scherm op desktop tussen het scannen van de qr code en het wachten op toegang. Daarom heb ik een div toegevoegd met de tekst "Geef toegang op uw gsm ..." Zodat mensen weten dat er daar iets zal moeten gebeuren.
+
+
+```javascript
+<div id="waitingPermission" class="waiting-screen">
+    <p>Geef toegang op uw gsm…</p>
+</div>
+```
+
+```javascript
+.waiting-screen {
+    position: fixed;
+    inset: 0;
+    background: #111;
+    color: white;
+    font-size: 2rem;
+    display: none; 
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+```
+
+Deze id moet ik dan toevoegen als de peer geconnect is, zodat het overpringt naar dat scherm.
+
+
+```javascript
+peer.on('connect', () => {
+    $status.textContent = "Controller connected!";
+    $qrContainer.style.display = "none";
+
+    document.getElementById("waitingPermission").style.display = "flex";
+});
+```
+
+Als de motion is toegestaan, moet dit scherm weer verborgen worden 
+
+
+```javascript
+if (message.type === "motionReady") {
+    console.log("Motion permission granted — game mag starten!");
+
+    document.getElementById("waitingPermission").style.display = "none";
+
+    const gameDiv = document.querySelector('.game');
+    gameDiv.style.display = "block";
+
+    startClouds();
+}
+```
+
+
+
+
 
 
 

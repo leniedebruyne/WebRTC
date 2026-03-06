@@ -116,4 +116,3 @@ shrinkBtn.addEventListener('click', () => {
     }
 });
 
-
