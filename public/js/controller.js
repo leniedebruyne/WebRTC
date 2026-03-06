@@ -46,7 +46,6 @@ window.addEventListener('beforeunload', () => {
 
 
 // swipe
-// Cursor sturen
 const sendCursor = e => {
     const rect = swipeSection.getBoundingClientRect();
 

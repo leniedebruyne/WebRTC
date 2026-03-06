@@ -36,15 +36,11 @@ let currentMode = "normal";
 // wolken functie
 
 function spawnCloud() {
-    console.log("Nieuwe wolk wordt gespawnd!");
-
     if (!cloudContainer) {
-        console.log("cloudContainer bestaat nog niet!");
         return;
     }
 
     if (cloudContainer.children.length >= maxClouds) {
-        console.log("Max aantal wolken bereikt:", cloudContainer.children.length);
         return;
     }
 
@@ -63,11 +59,8 @@ function spawnCloud() {
 
     cloudContainer.appendChild(cloud);
 
-    console.log("Wolk toegevoegd! Totaal nu:", cloudContainer.children.length);
-
     cloud.addEventListener('animationend', () => {
         cloud.remove();
-        console.log("💨 Wolk verdwenen (animationend)");
     });
 }
 
@@ -75,11 +68,9 @@ function spawnCloud() {
 // Elke 2–4 seconden een nieuwe wolk proberen spawnen
 function startClouds() {
     if (!cloudContainer) {
-        console.log(".clouds niet gevonden!");
         return;
     }
 
-    console.log("Wolken-animatie gestart!");
     setInterval(() => {
         spawnCloud();
     }, 2500);
@@ -129,7 +120,6 @@ function spawnBird() {
     gameArea.appendChild(bird);
 
     function animate() {
-        // kleine stapjes per frame
         const step = baseSpeed * speedMultiplier * direction;
         const steps = Math.ceil(Math.abs(step));
 
@@ -147,7 +137,7 @@ function spawnBird() {
                 birdRect.top < balloonRect.bottom &&
                 birdRect.bottom > balloonRect.top
             ) {
-                console.log("⚠️ Botsing gedetecteerd!");
+                console.log("Botsing gedetecteerd!");
                 bird.remove();
                 birdExists = false;
 
@@ -157,7 +147,7 @@ function spawnBird() {
                 if (lives <= 0) {
                     endGame();
                 }
-                return; // stop animatie
+                return; 
             }
         }
 
@@ -241,7 +231,6 @@ function updateBestTimeUI() {
 // grow
 function activateGrow() {
     if (currentMode === "grow") {
-        // terug naar normaal
         setNormalMode();
         return;
     }
@@ -256,7 +245,6 @@ function activateGrow() {
 // shrink
 function activateShrink() {
     if (currentMode === "shrink") {
-        // terug naar normaal
         setNormalMode();
         return;
     }

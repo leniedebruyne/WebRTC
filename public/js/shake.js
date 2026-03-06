@@ -1,8 +1,9 @@
-
-// --- MOTION PERMISSION FLOW ---
 const permissionScreen = document.getElementById("motionPermission");
 const enableMotionBtn = document.getElementById("enableMotion");
 
+let lastShake = 0;
+
+/* toegang krijgen */
 enableMotionBtn.addEventListener("click", async () => {
 
     if (typeof DeviceMotionEvent !== "undefined" &&
@@ -23,9 +24,8 @@ enableMotionBtn.addEventListener("click", async () => {
     }
 });
 
-// --- SHAKE DETECTION ---
-let lastShake = 0;
 
+/* shake detectie */
 function startShakeDetection() {
     window.addEventListener("devicemotion", (e) => {
         const acc = e.accelerationIncludingGravity;
