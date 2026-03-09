@@ -2702,6 +2702,93 @@ Dit zag er zo uit:
 ### Ui aanpassen
 Nu kan je nog zoveel boosts gebruiken als dat je wilt. Het is de bedoeling dat je maar max 3 boost kan gebruiken, en dat je dit aangeduid ziet aan de hand van gekleurde bolletjes.
 
+Ik heb een fucntie gemaakt die de bolletjes update aan de hand van hoeveel boosts er nog zijn.
+
+```javascript
+let boostsLeft = 3;
+const dots = document.querySelectorAll(".dot");
+
+function updateBoostUI() {
+
+    dots.forEach((dot, index) => {
+
+        if (index < boostsLeft) {
+            dot.style.background = "white"; // nog beschikbaar
+        } else {
+            dot.style.background = "#797575"; // al gebruikt
+        }
+
+    });
+
+}
+```
+
+Daarna heb ik mijn startShakeDetection functie een beetje aangepast. Ik heb eerst gekeken of er nog boosts over zijn, als die er niet meer zijn gebeurd er niks. Als er wel boosts over zijn verminder ik de counter met 1 en zet ik het bolletje op een grijze kleur. Dan stuur ik een shake bericht naar desktop om de boost functie te starten.
+
+```javascript
+ if (boostsLeft > 0 && peer && peer.connected) {
+
+                    boostsLeft--;
+
+                    updateBoostUI();
+
+                    peer.send(JSON.stringify({ type: "shake" }));
+                }
+```
+
+Hierna werkte de boost maar ik vond dat er nog wat feedback kon zijn als de boost op was. Ik kon gaan werken met een melding, maar als je bezig bent met een spel te spelen is dat super irritand. Daarom heb ik gedacht over een ander soort feedback en ik kwam uit bij het trillen van de gsm als je geen boosts meer hebt.
+
+Ik heb documentatie in MDN gevonden die tonen hoe je je gsm kan laten vibreren met de vibrate metohde.
+https://developer.mozilla.org/en-US/docs/Web/API/Navigator/vibrate
+
+Daarom heb ik mijn if statement in startShakeDetection aangevuld met een else en die logica er in.
+
+
+```javascript
+ if (strength > 35) {
+            const now = Date.now();
+            if (now - lastShake > 800) {
+                lastShake = now;
+
+                if (boostsLeft > 0 && peer && peer.connected) {
+
+                    boostsLeft--;
+
+                    updateBoostUI();
+
+                    peer.send(JSON.stringify({ type: "shake" }));
+                } else {
+                    navigator.vibrate([100, 50, 100]);
+                }
+            }
+        }
+```
+
+Ik kwam er helaas achter dat ios vibrate niet ondersteund. Ik moest dus opzoek naar iets anders. Daarom heb ik een bzz sound gedownload en deze in de if statement geplaatst. 
+
+Ook heb ik ervoor gezorgt dat mijn boosts resetten als het spel opnieuw begint. Daarom heb ik een if peer moeten toevoegen in de controller:
+
+```javascript
+if (peer) {
+    peer.on('data', (data) => {
+        const message = JSON.parse(data);
+        if (message.type === "resetBoosts") {
+            resetBoosts();
+        }
+    });
+}
+```
+
+En een functie reset boost:
+
+```javascript
+function resetBoosts() {
+    boostsLeft = 3;
+    updateBoostUI();
+}
+```
+
+
 
 
 

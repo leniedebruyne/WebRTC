@@ -45,6 +45,16 @@ window.addEventListener('beforeunload', () => {
 });
 
 
+// reset
+if (peer) {
+    peer.on('data', (data) => {
+        const message = JSON.parse(data);
+        if (message.type === "resetBoosts") {
+            resetBoosts();
+        }
+    });
+}
+
 // swipe
 const sendCursor = e => {
     const rect = swipeSection.getBoundingClientRect();
@@ -115,3 +125,9 @@ shrinkBtn.addEventListener('click', () => {
     }
 });
 
+// reset
+function resetBoosts() {
+    boostsLeft = 3;
+    updateBoostUI();
+}
+window.resetBoosts = resetBoosts;

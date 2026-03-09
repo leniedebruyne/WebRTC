@@ -315,6 +315,11 @@ function resetGame() {
 
     clearInterval(timerInterval);
 
+    if (peer && peer.connected) {
+        peer.send(JSON.stringify({ type: "resetBoosts" }));
+    }
+
+
 }
 
 function endGame() {

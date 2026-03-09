@@ -5,6 +5,10 @@ let lastShake = 0;
 
 let boostActive = false;
 
+let boostsLeft = 3;
+const dots = document.querySelectorAll(".dot");
+
+const sound = new Audio('/assets/error.mp3');
 
 /* toegang krijgen */
 if (enableMotionBtn) {
@@ -43,8 +47,16 @@ function startShakeDetection() {
             if (now - lastShake > 800) {
                 lastShake = now;
 
-                if (peer && peer.connected) {
+                if (boostsLeft > 0 && peer && peer.connected) {
+
+                    boostsLeft--;
+
+                    updateBoostUI();
+
                     peer.send(JSON.stringify({ type: "shake" }));
+                } else {
+                    sound.currentTime = 0;
+                    sound.play();
                 }
             }
         }
@@ -77,3 +89,26 @@ function activateBoost() {
         console.log("boost voorbij");
     }, 3000);
 }
+
+function updateBoostUI() {
+
+    dots.forEach((dot, index) => {
+
+        if (index < boostsLeft) {
+            dot.style.background = "white"; // nog beschikbaar
+        } else {
+            dot.style.background = "#797575"; // al gebruikt
+        }
+
+    });
+
+}
+
+
+
+function initBoost() {
+    updateBoostUI();
+}
+
+
+initBoost();
