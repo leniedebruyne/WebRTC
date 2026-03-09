@@ -6,6 +6,10 @@ const maxClouds = 4;
 let startTime = null;
 let timerInterval = null;
 const timeEl = document.querySelector('.time');
+let timeMultiplier = 1;
+let timeOffset = 0;
+let elapsedTime = 0;
+let lastTick = null;
 
 // vogel
 const bird = document.querySelector('.bird');
@@ -87,12 +91,21 @@ function formatTime(ms) {
 }
 
 function startTimer() {
-    startTime = Date.now();
+
+    lastTick = Date.now();
 
     timerInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        timeEl.textContent = `Time: ${formatTime(elapsed)}`;
-    }, 1000);
+
+        const now = Date.now();
+        const delta = now - lastTick;
+
+        elapsedTime += delta * timeMultiplier;
+
+        lastTick = now;
+
+        timeEl.textContent = `Time: ${formatTime(elapsedTime)}`;
+
+    }, 100);
 }
 
 
@@ -311,15 +324,16 @@ function resetGame() {
 
     gameOver = false;
 
-    timeEl.textContent = "Time: 00:00";
-
     clearInterval(timerInterval);
+
+    elapsedTime = 0;
+    lastTick = null;
+
+    timeEl.textContent = "Time: 00:00";
 
     if (peer && peer.connected) {
         peer.send(JSON.stringify({ type: "resetBoosts" }));
     }
-
-
 }
 
 function endGame() {
@@ -327,8 +341,8 @@ function endGame() {
 
     balloon.style.display = 'none';
 
-    const finalTime = Date.now() - startTime;
-
+    const finalTime = elapsedTime;
+    
     if (finalTime > bestTime) {
         bestTime = finalTime;
         localStorage.setItem('bestTime', bestTime);

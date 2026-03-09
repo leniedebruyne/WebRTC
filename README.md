@@ -2788,6 +2788,116 @@ function resetBoosts() {
 }
 ```
 
+#### AI hulp
+Ik heb gemerkt dat ios niet makkelijk is om voor te coderen. Zelfs een sound toevoegen was niet gemakkelijk. Daarom heb ik ai om hulp gevraagd. Dit was de prompt:
+Why does the error sound not play when the boosts are empty?
+
+Dit is wat ai antwoorde:
+
+Most likely because sound.play() is being called from the devicemotion event, which is not treated as a user gesture on many mobile browsers (especially iOS).
+So the play call is blocked by autoplay policy.
+
+Also, failures are currently silent because play() promise is not handled.
+
+A practical fix is to unlock audio on the button click (real user interaction), then reuse it later.
+
+
+```javascript
+// ...existing code...
+if (enableMotionBtn) {
+    enableMotionBtn.addEventListener("click", async () => {
+        // ...existing code...
+
+        // unlock audio on user gesture
+        try {
+            sound.muted = true;
+            await sound.play();
+            sound.pause();
+            sound.currentTime = 0;
+            sound.muted = false;
+        } catch (err) {
+            console.warn("Audio unlock failed:", err);
+        }
+
+        startShakeDetection();
+        permissionScreen.style.display = "none";
+
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: "motionReady" }));
+        }
+    });
+}
+// ...existing code...
+
+function startShakeDetection() {
+    window.addEventListener("devicemotion", (e) => {
+        // ...existing code...
+
+        if (strength > 35) {
+            const now = Date.now();
+            if (now - lastShake > 800) {
+                lastShake = now;
+
+                if (boostsLeft > 0 && peer && peer.connected) {
+                    boostsLeft--;
+                    updateBoostUI();
+                    peer.send(JSON.stringify({ type: "shake" }));
+                } else {
+                    sound.currentTime = 0;
+                    sound.play().catch(err => {
+                        console.warn("Error sound blocked:", err);
+                    });
+                }
+            }
+        }
+    });
+}
+```
+
+If it still doesn’t play, verify /assets/error.mp3 actually loads (Network tab, status 200).
+
+#### Reflectie
+Dit heeft gewerkt. 
+Het eerste is dat ik de auto moest activeren door een gebruikers interactie. Dit werd hier gedaan door die in een click handler te steken. 
+
+
+### Tijd laten versnellen met boost
+Ook moest ik de verstreken tijd wat versnellen als er een boost gebeurd, anders is het natuurlijk niet logisch dat je een boost zou doen.
+Ik heb ervoor gekozen dat je wat meer tijd extra krijgt van de boost als extra puntjes als je hem durft gebruiken.
+
+Daarom heb ik voor time ook een multiplier aangemaakt, de boost kan die dan opvangen en sneller maken.
+
+```javascript
+let elapsedTime = 0;
+let lastTick = null;
+let timeMultiplier = 1;
+
+function startTimer() {
+
+    lastTick = Date.now();
+
+    timerInterval = setInterval(() => {
+
+        const now = Date.now();
+        const delta = now - lastTick;
+
+        elapsedTime += delta * timeMultiplier;
+
+        lastTick = now;
+
+        timeEl.textContent = `Time: ${formatTime(elapsedTime)}`;
+
+    }, 100);
+}
+```
+
+En omdat ik nu Elapsed time gebruik moet ik dit ook veranderen in de endGame functie en de resetGame.
+
+## Onboarding
+
+
+
+
 
 
 

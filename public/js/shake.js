@@ -14,22 +14,33 @@ const sound = new Audio('/assets/error.mp3');
 if (enableMotionBtn) {
     enableMotionBtn.addEventListener("click", async () => {
 
-    if (typeof DeviceMotionEvent !== "undefined" &&
-        typeof DeviceMotionEvent.requestPermission === "function") {
+        if (typeof DeviceMotionEvent !== "undefined" &&
+            typeof DeviceMotionEvent.requestPermission === "function") {
 
-        const res = await DeviceMotionEvent.requestPermission();
-        if (res !== "granted") {
-            alert("Motion permission is nodig om te shakken!");
-            return;
+            const res = await DeviceMotionEvent.requestPermission();
+            if (res !== "granted") {
+                alert("Motion permission is nodig om te shakken!");
+                return;
+            }
         }
-    }
 
-    startShakeDetection();
-    permissionScreen.style.display = "none";
+        // unlock audio on user gesture
+        try {
+            sound.muted = true;
+            await sound.play();
+            sound.pause();
+            sound.currentTime = 0;
+            sound.muted = false;
+        } catch (err) {
+            console.warn("Audio unlock failed:", err);
+        }
 
-    if (peer && peer.connected) {
-        peer.send(JSON.stringify({ type: "motionReady" }));
-    }
+        startShakeDetection();
+        permissionScreen.style.display = "none";
+
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: "motionReady" }));
+        }
     });
 }
 
@@ -48,15 +59,14 @@ function startShakeDetection() {
                 lastShake = now;
 
                 if (boostsLeft > 0 && peer && peer.connected) {
-
                     boostsLeft--;
-
                     updateBoostUI();
-
                     peer.send(JSON.stringify({ type: "shake" }));
                 } else {
                     sound.currentTime = 0;
-                    sound.play();
+                    sound.play().catch(err => {
+                        console.warn("Error sound blocked:", err);
+                    });
                 }
             }
         }
@@ -73,20 +83,28 @@ function activateBoost() {
     boostActive = true;
 
     const oldMultiplier = speedMultiplier;
+
     speedMultiplier = 5;
+    timeMultiplier = 5;
 
     console.log("boost actief");
 
-    // extra wolken
     for (let i = 0; i < 3; i++) {
         spawnCloud();
     }
 
     setTimeout(() => {
+
         speedMultiplier = oldMultiplier;
+        timeMultiplier = 1;
+
+        // bonus seconden
+        elapsedTime += 2000;
+
         boostActive = false;
 
         console.log("boost voorbij");
+
     }, 3000);
 }
 
