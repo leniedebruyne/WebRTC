@@ -76,6 +76,8 @@ socket.on('signal', ({ senderId, signal }) => {
 
             if (message.type === "shake") {
                 console.log("SHAKE ontvangen van controller");
+
+                window.dispatchEvent(new Event("boost"));
             }
 
             if (message.type === 'move') {

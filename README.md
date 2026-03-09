@@ -2649,6 +2649,63 @@ if (message.type === "motionReady") {
 }
 ```
 
+## Boost
+Nu is het tijd om de boost te maken. Het is de bedoeling dat als de gsm geschud word, je een boost krijgt voor 5 seconden. Het lijkt alsof de ballon sneller gaat, maar het is eigenlijk de wolken en vogels die sneller zullen bewegen. je mag de boost max 3 keer gebruiken, je kunt zien hoeveel boosts je al hebt gebruikt aan de hand van de bolletjes boven het gsm scherm.
+
+### Omgeving sneller bewegen
+De eerste logica die ik zal schrijven is het sneller bewegen van de omgeing als er een schud gedetecteerd is.
+
+Omdat ik voor de wolken en vogels al met een multiplier werkte, voor grow en shrink was het makkelijk om die ook te gebruiken bij mijn boost.
+Verder heb ik wat meer wolkjes toegevoegd als de boost actief is zodat het wat duidelijker is. Ik heb ervoor gezorgt dat de boost 3 seconden duurt. 
+
+
+```javascript
+window.addEventListener("boost", activateBoost);
+
+function activateBoost() {
+
+    if (boostActive) return;
+
+    boostActive = true;
+
+    const oldMultiplier = speedMultiplier;
+    speedMultiplier = 5;
+
+    console.log("boost actief");
+
+    // extra wolken
+    for (let i = 0; i < 3; i++) {
+        spawnCloud();
+    }
+
+    setTimeout(() => {
+        speedMultiplier = oldMultiplier;
+        boostActive = false;
+
+        console.log("boost voorbij");
+    }, 3000);
+}
+```
+
+Daarna moest ik in mijn desktop.js kunnen zeggen dat als er geshaked word, er een event gebeurd met de naam boost. Dit heb ik gedaan met het window.dispatchEvent. 
+https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent
+
+Dit zag er zo uit:
+```javascript
+            if (message.type === "shake") {
+                console.log("SHAKE ontvangen van controller");
+
+                window.dispatchEvent(new Event("boost"));
+            }
+```
+
+### Ui aanpassen
+Nu kan je nog zoveel boosts gebruiken als dat je wilt. Het is de bedoeling dat je maar max 3 boost kan gebruiken, en dat je dit aangeduid ziet aan de hand van gekleurde bolletjes.
+
+
+
+
+
 
 
 

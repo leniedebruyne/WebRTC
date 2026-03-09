@@ -3,8 +3,12 @@ const enableMotionBtn = document.getElementById("enableMotion");
 
 let lastShake = 0;
 
+let boostActive = false;
+
+
 /* toegang krijgen */
-enableMotionBtn.addEventListener("click", async () => {
+if (enableMotionBtn) {
+    enableMotionBtn.addEventListener("click", async () => {
 
     if (typeof DeviceMotionEvent !== "undefined" &&
         typeof DeviceMotionEvent.requestPermission === "function") {
@@ -22,7 +26,8 @@ enableMotionBtn.addEventListener("click", async () => {
     if (peer && peer.connected) {
         peer.send(JSON.stringify({ type: "motionReady" }));
     }
-});
+    });
+}
 
 
 /* shake detectie */
@@ -44,4 +49,31 @@ function startShakeDetection() {
             }
         }
     });
+}
+
+// Boost logica
+window.addEventListener("boost", activateBoost);
+
+function activateBoost() {
+
+    if (boostActive) return;
+
+    boostActive = true;
+
+    const oldMultiplier = speedMultiplier;
+    speedMultiplier = 5;
+
+    console.log("boost actief");
+
+    // extra wolken
+    for (let i = 0; i < 3; i++) {
+        spawnCloud();
+    }
+
+    setTimeout(() => {
+        speedMultiplier = oldMultiplier;
+        boostActive = false;
+
+        console.log("boost voorbij");
+    }, 3000);
 }

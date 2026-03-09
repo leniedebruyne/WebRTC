@@ -73,7 +73,7 @@ function startClouds() {
 
     setInterval(() => {
         spawnCloud();
-    }, 2500);
+    }, 1000 / speedMultiplier);
 }
 
 // time functie
