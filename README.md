@@ -2893,6 +2893,37 @@ function startTimer() {
 
 En omdat ik nu Elapsed time gebruik moet ik dit ook veranderen in de endGame functie en de resetGame.
 
+## Planning week 3
+### Wat heb ik in week 2 gedaan?
+In week 3 heb ik redelijk veel tecnische elementen toegevoegd en mijn code beter gemaakt. Dit is een lijst aan dingen die ik heb opgelost / toegevoegd.
+
+1. Alle Javascript en css heb ik in apparte bestandjes gezet. Zo word mijn prpoject overzichtelijker.
+2. Als mijn gsm uitgaat, en er dus geen connectie meer is, gaat het spel terug naar het scherm met de qr code.
+3. Als je verloren bent (geen levens meer hebt) start er automatisch een reset teller die je dan terug brengt naar een nieuw spel.
+4. Ook heb ik de boost logica toegevoegd, denk daarbij aan ontvangen als de telefoon geschud word, omgeving sneller laten bewegen, timer sneller laten gaan, ui aanpassen aan hoeveel boosts je nog over hebt en een geluid laten afspelen als je geen boosts meer over hebt.
+
+### Onboarding
+Het eerste wat ik in week 3 wil maken is de onboarding. Ik was lang aan het twijfelen hoe ik dit zou aanpakken: In het spel zelf? Foto's? Tekst? Maar ik besloot om voor een goede ui te gaan en de onboarding op het qr code scherm te zetten. Ik zal de visuals met after effects maken, zo kan ik ook leren hoe ik dit dan in mijn code moet zetten. De mensen zien op deze manier al hoe het spel zal gaan terwijl ze de code scannen.
+Ik wil de hoofd interacties op de onboarding tonen, deze zijn: swipen, tikken om groter te worden, tikken om kleiner te worden en gsm schudden voor een boost.
+
+### Bug fixes
+Ook zal ik nog een aantal kleine bugs proberen fixen. De eerste is dat de botsing soms niet helemaal acuraat is, soms vlieg je tegen een vogel en neemt er geen hartje af. Ik zal proberen vinden aan wat dit probleem kan liggen. Ook beweegt de ballon soms wat hakkerig, daarvoor zal ik ook een oplossing proberen vinden.
+
+### Extra's
+Ook lijkt het me leuk om nog wat extra's aan de game toe te voegen. Dit zijn de ideetjes:
+1. Hoe langer je in het spel zit, hoe sneller de ballon vliegt (of hoe meer vogels er zijn).
+2. Als er een botsing is met een vogel, moet deze een andere kleur worden (bv. rood).
+3. Misschien kan ik nog andere "gevaarlijke" elementen toevoegen zoals een vliegtuig of een boom.
+
+## Consult 3
+### Extra functies
+Het zou duidelijker zijn waarom je je ballon kan laten krimpen en groeien als je dit moet doen om bijvoorbeeld iets te pakken voor extra hartjes of een shield.
+
+### Technisch
+-  Best geen window.... gebruiken maar javascript exporteren met type module
+-  Zorg ervoor dat alle functies gelijk worden opgemaakt.
+- Disconnect mag inderdaad zoals ik het nu heb maar ik mag nog de peer on toevoegen zodat het zeker goed is. 
+
 ## Onboarding
 
 

@@ -1,6 +1,8 @@
 // wolken
 const cloudContainer = document.querySelector('.clouds');
 const maxClouds = 4;
+const cloud = document.createElement('div');
+
 
 // time
 let startTime = null;
@@ -32,8 +34,6 @@ let bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
 let balloonScale = 1;
 let speedMultiplier = 1;
 let currentMode = "normal";
-
-
 
 
 
@@ -94,7 +94,7 @@ function startTimer() {
 
     lastTick = Date.now();
 
-    timerInterval = setInterval(() => {
+    function updateTimer() {
 
         const now = Date.now();
         const delta = now - lastTick;
@@ -105,7 +105,9 @@ function startTimer() {
 
         timeEl.textContent = `Time: ${formatTime(elapsedTime)}`;
 
-    }, 100);
+    }
+
+    timerInterval = setInterval(updateTimer, 100);
 }
 
 
@@ -160,7 +162,7 @@ function spawnBird() {
                 if (lives <= 0) {
                     endGame();
                 }
-                return; 
+                return;
             }
         }
 
@@ -177,9 +179,7 @@ function spawnBird() {
     animate();
 }
 
-const birdInterval = setInterval(() => {
-    spawnBird();
-}, 1000);
+const birdInterval = setInterval(spawnBird, 1000);
 
 
 
@@ -299,8 +299,11 @@ function startCountdown() {
     container.textContent = `Reset in ${count}...`;
     document.body.appendChild(container);
 
-    const interval = setInterval(() => {
+    let interval;
+
+    function handleResetCountdown() {
         count--;
+
         if (count <= 0) {
             clearInterval(interval);
             container.remove();
@@ -309,7 +312,9 @@ function startCountdown() {
         } else {
             container.textContent = `Reset in ${count}...`;
         }
-    }, 1000);
+    }
+
+    interval = setInterval(handleResetCountdown, 1000);
 }
 
 
@@ -342,7 +347,7 @@ function endGame() {
     balloon.style.display = 'none';
 
     const finalTime = elapsedTime;
-    
+
     if (finalTime > bestTime) {
         bestTime = finalTime;
         localStorage.setItem('bestTime', bestTime);

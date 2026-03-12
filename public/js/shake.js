@@ -93,8 +93,7 @@ function activateBoost() {
         spawnCloud();
     }
 
-    setTimeout(() => {
-
+    function endBoost() {
         speedMultiplier = oldMultiplier;
         timeMultiplier = 1;
 
@@ -104,8 +103,9 @@ function activateBoost() {
         boostActive = false;
 
         console.log("boost voorbij");
+    }
 
-    }, 3000);
+    setTimeout(endBoost, 3000);
 }
 
 function updateBoostUI() {
