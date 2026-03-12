@@ -1,3 +1,6 @@
+// import
+/* import resetBoosts from '/js/controller.js'; */
+
 // wolken
 const cloudContainer = document.querySelector('.clouds');
 const maxClouds = 4;
@@ -340,6 +343,7 @@ function resetGame() {
     if (peer && peer.connected) {
         peer.send(JSON.stringify({ type: "resetBoosts" }));
     }
+    /* resetBoosts(); */
 }
 
 

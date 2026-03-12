@@ -142,4 +142,12 @@ function resetBoosts() {
     boostsLeft = 3;
     updateBoostUI();
 }
+
+
+/* export default function resetBoosts() {
+    boostsLeft = 3;
+    updateBoostUI();
+} */
+
+// bij deze functie gebruik ik window omdat hij anders faalt bij de peer
 window.resetBoosts = resetBoosts;
