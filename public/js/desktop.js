@@ -94,6 +94,10 @@ socket.on('signal', ({ senderId, signal }) => {
             resetToQR();
         });
 
+        socket.on('peerDisconnected', () => {
+            resetToQR(); 
+        });
+
         peer.on('connect', () => {
             $status.textContent = "Controller connected!";
             $qrContainer.style.display = "none";
