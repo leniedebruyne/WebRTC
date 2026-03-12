@@ -7,15 +7,19 @@ const desktopId = new URLSearchParams(window.location.search).get('id');
 const swipeSection = document.querySelector('.swipe-section');
 const $touchCursor = document.getElementById('touchCursor');
 
+// buttons
+const growBtn = document.querySelector('.grow');
+const shrinkBtn = document.querySelector('.shrink');
+
 // game
 const startScreen = document.getElementById("startScreen");
 let gameStarted = false;
 
 
+
 if (!desktopId) {
     alert("Missing desktop ID in URL!");
 }
-
 
 // Controller is initiator
 const peer = new SimplePeer({
@@ -46,7 +50,6 @@ window.addEventListener('beforeunload', () => {
     socket.emit('controllerDisconnected', desktopId);
 });
 
-
 // reset
 if (peer) {
     peer.on('data', (data) => {
@@ -56,6 +59,8 @@ if (peer) {
         }
     });
 }
+
+
 
 // swipe
 function sendCursor(e) {
@@ -100,34 +105,36 @@ function sendCursor(e) {
     }
 }
 
+
+
 function handleTouch(e) {
     e.preventDefault();
     sendCursor(e.touches[0]);
 }
-
 swipeSection.addEventListener('mousemove', sendCursor);
 swipeSection.addEventListener('touchstart', handleTouch, { passive: false });
 swipeSection.addEventListener('touchmove', handleTouch, { passive: false });
 
-// grow
-const growBtn = document.querySelector('.grow');
-growBtn.addEventListener('click', handleGrowClick);
 
+
+// grow
+growBtn.addEventListener('click', handleGrowClick);
 function handleGrowClick() {
     if (peer.connected) {
         peer.send(JSON.stringify({ type: 'grow' }));
     }
 }
 
-// shrink
-const shrinkBtn = document.querySelector('.shrink');
-shrinkBtn.addEventListener('click', handleShrinkClick);
 
+
+// shrink
+shrinkBtn.addEventListener('click', handleShrinkClick);
 function handleShrinkClick() {
     if (peer.connected) {
         peer.send(JSON.stringify({ type: 'shrink' }));
     }
 }
+
 
 
 // reset

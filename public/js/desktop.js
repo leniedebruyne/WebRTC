@@ -1,17 +1,20 @@
 /* client code, desktop */
 
-
+// socket en peer
 const socket = io();
-
 const $url = document.getElementById('url');
 const $status = document.getElementById('status');
 const $qrContainer = document.getElementById('qrContainer');
-
 let peer = null;
 let cursor = null;
 let currentControllerId = null;
 
+// ballon
 const balloon = document.querySelector('.balloon');
+
+// reset
+const gameDiv = document.querySelector('.game');
+
 
 
 
@@ -31,7 +34,6 @@ socket.on('connect', () => {
 
 // Signalling via socket
 socket.on('signal', ({ senderId, signal }) => {
-
     currentControllerId = senderId;
 
     // Maak peer enkel aan bij eerste connect
@@ -48,9 +50,6 @@ socket.on('signal', ({ senderId, signal }) => {
                 signal: data
             });
         });
-
-
-
 
         // 1x initial position
         balloon.style.left = `${window.innerWidth / 2 - balloon.offsetWidth / 2}px`;
@@ -126,9 +125,9 @@ socket.on('signal', ({ senderId, signal }) => {
 });
 
 
+
 // reset bij disconnect
 function resetToQR() {
-    const gameDiv = document.querySelector('.game');
     gameDiv.style.display = "none";
 
     balloon.style.left = `${window.innerWidth / 2 - balloon.offsetWidth / 2}px`;

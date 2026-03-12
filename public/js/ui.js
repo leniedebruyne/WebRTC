@@ -3,7 +3,6 @@ const cloudContainer = document.querySelector('.clouds');
 const maxClouds = 4;
 const cloud = document.createElement('div');
 
-
 // time
 let startTime = null;
 let timerInterval = null;
@@ -38,7 +37,6 @@ let currentMode = "normal";
 
 
 // wolken functie
-
 function spawnCloud() {
     if (!cloudContainer) {
         return;
@@ -68,7 +66,6 @@ function spawnCloud() {
     });
 }
 
-
 // Elke 2–4 seconden een nieuwe wolk proberen spawnen
 function startClouds() {
     if (!cloudContainer) {
@@ -80,8 +77,9 @@ function startClouds() {
     }, 1000 / speedMultiplier);
 }
 
-// time functie
 
+
+// time functie
 function formatTime(ms) {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -91,7 +89,6 @@ function formatTime(ms) {
 }
 
 function startTimer() {
-
     lastTick = Date.now();
 
     function updateTimer() {
@@ -100,15 +97,13 @@ function startTimer() {
         const delta = now - lastTick;
 
         elapsedTime += delta * timeMultiplier;
-
         lastTick = now;
-
         timeEl.textContent = `Time: ${formatTime(elapsedTime)}`;
-
     }
 
     timerInterval = setInterval(updateTimer, 100);
 }
+
 
 
 // vogel functie
@@ -183,9 +178,7 @@ const birdInterval = setInterval(spawnBird, 1000);
 
 
 
-
 // levens functie
-
 function animate() {
     pos += speed * direction;
     bird.style.left = pos + 'px';
@@ -215,7 +208,6 @@ function animate() {
         }
     }
 
-
     // check of buiten scherm
     if ((direction === 1 && pos > window.innerWidth + 60) ||
         (direction === -1 && pos < -60)) {
@@ -227,9 +219,13 @@ function animate() {
     requestAnimationFrame(animate);
 }
 
+
+
+// update levens
 function updateLivesUI() {
     livesContainer.textContent = '❤️'.repeat(lives);
 }
+
 
 
 // best time
@@ -241,6 +237,8 @@ function updateBestTimeUI() {
     }
 }
 
+
+
 // grow
 function activateGrow() {
     if (currentMode === "grow") {
@@ -251,9 +249,10 @@ function activateGrow() {
     balloonScale = 1.8;
     speedMultiplier = 0.3;
     currentMode = "grow";
-
     balloon.style.transform = `scale(${balloonScale})`;
 }
+
+
 
 // shrink
 function activateShrink() {
@@ -265,16 +264,16 @@ function activateShrink() {
     balloonScale = 0.6;
     speedMultiplier = 1.8;
     currentMode = "shrink";
-
     balloon.style.transform = `scale(${balloonScale})`;
 }
+
+
 
 // normal
 function setNormalMode() {
     balloonScale = 1;
     speedMultiplier = 1;
     currentMode = "normal";
-
     balloon.style.transform = `scale(${balloonScale})`;
 }
 
@@ -318,6 +317,8 @@ function startCountdown() {
 }
 
 
+
+// reset
 function resetGame() {
 
     lives = 3;
@@ -341,6 +342,9 @@ function resetGame() {
     }
 }
 
+
+
+// end game
 function endGame() {
     clearInterval(timerInterval);
 
@@ -359,6 +363,7 @@ function endGame() {
 
     startCountdown();
 }
+
 
 
 function initGame() {

@@ -1,14 +1,16 @@
+
+// permision
 const permissionScreen = document.getElementById("motionPermission");
 const enableMotionBtn = document.getElementById("enableMotion");
 
+// boost
 let lastShake = 0;
-
 let boostActive = false;
-
 let boostsLeft = 3;
 const dots = document.querySelectorAll(".dot");
-
 const sound = new Audio('/assets/error.mp3');
+
+
 
 /* toegang krijgen */
 if (enableMotionBtn) {
@@ -45,6 +47,7 @@ if (enableMotionBtn) {
 }
 
 
+
 /* shake detectie */
 function startShakeDetection() {
     window.addEventListener("devicemotion", (e) => {
@@ -72,6 +75,8 @@ function startShakeDetection() {
         }
     });
 }
+
+
 
 // Boost logica
 window.addEventListener("boost", activateBoost);
@@ -108,6 +113,8 @@ function activateBoost() {
     setTimeout(endBoost, 3000);
 }
 
+
+// Ui
 function updateBoostUI() {
 
     dots.forEach((dot, index) => {
