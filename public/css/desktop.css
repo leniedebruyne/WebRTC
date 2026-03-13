@@ -79,6 +79,76 @@ body {
     overflow: hidden;
 }
 
+.status-sidebar-desktop {
+    position: absolute;
+    top: calc(50% + 50px);
+    left: 24px;
+    transform: translateY(-50%);
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 12;
+}
+
+.status-card-desktop {
+    padding: 14px 12px;
+    border-radius: 16px;
+    background: rgba(248, 250, 254, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.status-label-desktop {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2f5f9d;
+    opacity: 0.9;
+}
+
+.status-value-desktop {
+    margin: 6px 0 10px;
+    font-size: 30px;
+    line-height: 1.05;
+    font-weight: 700;
+    color: #1f4777;
+}
+
+.status-steps-desktop {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.status-pill-desktop {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.55);
+    color: rgba(42, 83, 134, 0.65);
+}
+
+.status-pill-desktop.is-active {
+    background: #4174AC;
+    color: #fff;
+    font-weight: 700;
+}
+
+.boost-state-desktop {
+    margin: 10px 0 0;
+    font-size: 15px;
+    color: #2f5f9d;
+    opacity: 0.88;
+}
+
+.boost-state-desktop.is-active {
+    color: #184a84;
+    font-weight: 700;
+}
+
 .hud {
     position: absolute;
     top: 0;

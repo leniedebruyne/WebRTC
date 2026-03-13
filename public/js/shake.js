@@ -86,6 +86,7 @@ function activateBoost() {
     if (boostActive) return;
 
     boostActive = true;
+    window.dispatchEvent(new CustomEvent('boostStateChange', { detail: { active: true } }));
 
     const oldMultiplier = speedMultiplier;
 
@@ -106,6 +107,7 @@ function activateBoost() {
         elapsedTime += 2000;
 
         boostActive = false;
+        window.dispatchEvent(new CustomEvent('boostStateChange', { detail: { active: false } }));
 
         console.log("boost voorbij");
     }

@@ -3295,7 +3295,234 @@ body {
 }
 ```
 
+## Status ui
+Op het consult werd er gesproken over een ui op dekstop, die aantoont hoe groot je ballon is op het moment van spelen, en hoe snel deze gaat. Dit vond ik een leuk idee dus heb ik geprobeerd om dit zelf ook toe te voegen. ik ben begonnen met de html. Ik heb ervoor gekozen om te werken met een aside, omdat het aan de zijkant van het scherm zal komen.
 
+verder wist ik niet hoe ik de link kon gaan maken met de ui en de groote en snelheid van de ballon. Daarom heb ik ai ingeschakeld.
+
+### AI
+#### Prompt
+Hey, I want to create a UI block on the side of my desktop. It should show how big the balloon is at any given moment during gameplay, and how fast it’s moving. That way, the user gets real-time updates. I’m wondering how I should combine the logic of all the different functions into that UI block.
+
+#### Antwoord
+Updated
+
+public/index.html
+public/css/desktop.css
+public/js/ui.js
+public/js/shake.js
+What you see now on desktop
+
+Left status bar in the game with:
+Size: Small / Medium / Large
+Speed: Slow / Medium / Fast
+Boost status: Boost off / Boost active
+Grow ⇒ large + slow
+Shrink ⇒ small + fast
+Boost temporarily increases the displayed speed by 1 step (max Fast)
+In reset/normal mode, the status reverts to medium + medium
+Would you like me to also hide the same status bar until the game has started (and only display it after motion permission)?
+
+```javascript
+        <aside class="status-sidebar-desktop">
+            <div class="status-card-desktop">
+                <p class="status-label-desktop">Grootte</p>
+                <p class="status-value-desktop status-size-value">Middelmatig</p>
+                <div class="status-steps-desktop">
+                    <span class="status-pill-desktop" data-size="small">Klein</span>
+                    <span class="status-pill-desktop is-active" data-size="medium">Middel</span>
+                    <span class="status-pill-desktop" data-size="large">Groot</span>
+                </div>
+            </div>
+
+            <div class="status-card-desktop">
+                <p class="status-label-desktop">Snelheid</p>
+                <p class="status-value-desktop status-speed-value">Middel</p>
+                <div class="status-steps-desktop">
+                    <span class="status-pill-desktop" data-speed="slow">Traag</span>
+                    <span class="status-pill-desktop is-active" data-speed="medium">Middel</span>
+                    <span class="status-pill-desktop" data-speed="fast">Snel</span>
+                </div>
+                <p class="boost-state-desktop">Boost uit</p>
+            </div>
+        </aside>
+```
+
+
+```javascript
+.status-sidebar-desktop {
+    position: absolute;
+    top: 140px;
+    left: 24px;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 12;
+}
+
+.status-card-desktop {
+    padding: 14px 12px;
+    border-radius: 16px;
+    background: rgba(248, 250, 254, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.status-label-desktop {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2f5f9d;
+    opacity: 0.9;
+}
+
+.status-value-desktop {
+    margin: 6px 0 10px;
+    font-size: 30px;
+    line-height: 1.05;
+    font-weight: 700;
+    color: #1f4777;
+}
+
+.status-steps-desktop {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.status-pill-desktop {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.55);
+    color: rgba(42, 83, 134, 0.65);
+}
+
+.status-pill-desktop.is-active {
+    background: #4174AC;
+    color: #fff;
+    font-weight: 700;
+}
+
+.boost-state-desktop {
+    margin: 10px 0 0;
+    font-size: 15px;
+    color: #2f5f9d;
+    opacity: 0.88;
+}
+
+.boost-state-desktop.is-active {
+    color: #184a84;
+    font-weight: 700;
+}
+```
+
+```javascript
+    window.dispatchEvent(new CustomEvent('boostStateChange', { detail: { active: true } }));
+            window.dispatchEvent(new CustomEvent('boostStateChange', { detail: { active: false } }));
+
+
+```
+
+
+```javascript
+let boostStatusActive = false;
+
+const sizeValueDesktopEl = document.querySelector('.status-size-value');
+const speedValueDesktopEl = document.querySelector('.status-speed-value');
+const boostStateDesktopEl = document.querySelector('.boost-state-desktop');
+const sizePillsDesktop = document.querySelectorAll('.status-pill-desktop[data-size]');
+const speedPillsDesktop = document.querySelectorAll('.status-pill-desktop[data-speed]');
+
+const DESKTOP_STATUS_LABELS = {
+    size: {
+        small: 'Klein',
+        medium: 'Middelmatig',
+        large: 'Groot'
+    },
+    speed: {
+        slow: 'Traag',
+        medium: 'Middel',
+        fast: 'Snel'
+    }
+};
+
+const desktopStatus = {
+    size: 'medium',
+    speed: 'medium'
+};
+
+
+
+
+
+function updateStatusPillsDesktop(pills, activeValue, key) {
+    pills.forEach((pill) => {
+        const isActive = pill.dataset[key] === activeValue;
+        pill.classList.toggle('is-active', isActive);
+    });
+}
+
+function getDisplayedSpeedDesktop() {
+    const order = ['slow', 'medium', 'fast'];
+    const baseIndex = order.indexOf(desktopStatus.speed);
+
+    if (!boostStatusActive) {
+        return desktopStatus.speed;
+    }
+
+    return order[Math.min(baseIndex + 1, order.length - 1)];
+}
+
+function renderDesktopStatus() {
+    const displayedSpeed = getDisplayedSpeedDesktop();
+
+    if (sizeValueDesktopEl) {
+        sizeValueDesktopEl.textContent = DESKTOP_STATUS_LABELS.size[desktopStatus.size];
+    }
+
+    if (speedValueDesktopEl) {
+        speedValueDesktopEl.textContent = DESKTOP_STATUS_LABELS.speed[displayedSpeed];
+    }
+
+    updateStatusPillsDesktop(sizePillsDesktop, desktopStatus.size, 'size');
+    updateStatusPillsDesktop(speedPillsDesktop, displayedSpeed, 'speed');
+
+    if (boostStateDesktopEl) {
+        boostStateDesktopEl.textContent = boostStatusActive ? 'Boost actief' : 'Boost uit';
+        boostStateDesktopEl.classList.toggle('is-active', boostStatusActive);
+    }
+}
+
+window.addEventListener('boostStateChange', (event) => {
+    boostStatusActive = !!event.detail?.active;
+    renderDesktopStatus();
+});
+```
+
+
+```javascript
+    desktopStatus.size = 'large';
+    desktopStatus.speed = 'slow';
+    renderDesktopStatus();
+
+        desktopStatus.size = 'small';
+    desktopStatus.speed = 'fast';
+    renderDesktopStatus();
+
+        desktopStatus.size = 'medium';
+    desktopStatus.speed = 'medium';
+    renderDesktopStatus();
+
+        renderDesktopStatus();
+
+```
+
+### Reflectie
+Ai heeft dit stuk eigenlijk helemaal voor mij geschreven, behalve de index file dan. Wel heb ik de logica van de ui in een appart sidebar.js bestand gestopt, zodat ik deze logica nog eens kan bekijken en aanpassen waar nodig. 
 
 
 

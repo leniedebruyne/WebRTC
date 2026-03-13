@@ -35,9 +35,6 @@ let bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
 // grow
 let balloonScale = 1;
 let speedMultiplier = 1;
-let currentMode = "normal";
-
-
 
 
 
@@ -264,6 +261,10 @@ function activateGrow() {
     speedMultiplier = 0.3;
     currentMode = "grow";
     balloon.style.transform = `scale(${balloonScale})`;
+
+    desktopStatus.size = 'large';
+    desktopStatus.speed = 'slow';
+    renderDesktopStatus();
 }
 
 
@@ -279,6 +280,10 @@ function activateShrink() {
     speedMultiplier = 1.8;
     currentMode = "shrink";
     balloon.style.transform = `scale(${balloonScale})`;
+
+    desktopStatus.size = 'small';
+    desktopStatus.speed = 'fast';
+    renderDesktopStatus();
 }
 
 
@@ -289,6 +294,10 @@ function setNormalMode() {
     speedMultiplier = 1;
     currentMode = "normal";
     balloon.style.transform = `scale(${balloonScale})`;
+
+    desktopStatus.size = 'medium';
+    desktopStatus.speed = 'medium';
+    renderDesktopStatus();
 }
 
 
@@ -387,6 +396,7 @@ function endGame() {
 function initGame() {
     updateBestTimeUI();
     updateLivesUI();
+    renderDesktopStatus();
 
     scheduleHeart();
     scheduleShield();
