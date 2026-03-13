@@ -133,3 +133,87 @@ body {
 
     z-index: 9999;
 }
+
+.heart {
+    position: absolute;
+    top: -80px;
+    width: 80px;
+    height: 80px;
+    animation: fall 5s linear forwards;
+}
+
+.heart svg {
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh);
+    }
+}
+
+.shield {
+    position: absolute;
+    top: -80px;
+    width: 70px;
+    height: 70px;
+    animation: fall 5s linear forwards;
+}
+
+.shield svg {
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh);
+    }
+}
+
+/* shield */
+.balloon.shielded {
+    position: relative;
+}
+
+.balloon.shielded::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 120%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+
+    box-shadow:
+        0 0 25px 12px rgba(80, 120, 255, 0.6),
+        inset 0 0 20px rgba(255, 255, 255, 0.4);
+
+    animation: shieldPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes shieldPulse {
+    0% {
+        box-shadow:
+            0 0 25px 12px rgba(80, 120, 255, 0.6),
+            inset 0 0 20px rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        box-shadow:
+            0 0 35px 18px rgba(120, 160, 255, 0.8),
+            inset 0 0 25px rgba(255, 255, 255, 0.5);
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    100% {
+        box-shadow:
+            0 0 25px 12px rgba(80, 120, 255, 0.6),
+            inset 0 0 20px rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%) scale(1);
+    }
+}

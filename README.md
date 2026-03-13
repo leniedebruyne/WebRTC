@@ -2924,6 +2924,285 @@ Het zou duidelijker zijn waarom je je ballon kan laten krimpen en groeien als je
 -  Zorg ervoor dat alle functies gelijk worden opgemaakt.
 - Disconnect mag inderdaad zoals ik het nu heb maar ik mag nog de peer on toevoegen zodat het zeker goed is. 
 
+## Extra hartjes -> Ballon groot
+Het volgende dat ik wil doen is op een random moment svg hartjes naar beneden laten vallen, deze kan je alleen pakken als je ballon groot is, en dan komt er een hartje bij.
+
+Het eerste wat ik wil doen is de hartjes op een random tijd van 6-10 seconden laten vallen. 
+
+Ik heb als eerst een div toegevoegd in mijn html.
+```javascript
+        <!--random hartjes-->
+        <div class="hearts"></div>
+```
+
+Dan heb ik die wat styling gegeven met css.
+```javascript
+.heart {
+    position: absolute;
+    top: -80px;
+    width: 80px;
+    height: 80px;
+    animation: fall 5s linear forwards;
+}
+
+.heart svg {
+    width: 100%;
+    height: 100%;
+}
+```
+
+Ook heb ik css gebruikt om de val te animeren.
+```javascript
+@keyframes fall {
+    to {
+        transform: translateY(110vh);
+    }
+}
+```
+
+Daarna heb ik in javascript de svg toegevoegd en gezorg dat het hartje op een random plaats horizontaal spawnt. 
+```javascript
+function spawnHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+
+    heart.style.left = Math.random() * 90 + "vw";
+
+    heart.innerHTML = `
+<svg viewBox="0 0 32 32">
+  <path fill="red" d="M16,28.261c-0.757,0-1.515-0.288-2.094-0.867C6.02,20.258,2.02,15.86,2.02,11.275c0-4.001,3.251-7.253,7.253-7.253 c2.115,0,3.955,0.925,5.253,2.464c1.298-1.539,3.138-2.464,5.253-2.464c4.001,0,7.253,3.252,7.253,7.253 c0,4.585-4,8.583-11.886,16.119C17.515,27.973,16.757,28.261,16,28.261z"/>
+</svg>
+`;
+
+    gameArea.appendChild(heart);
+
+    heart.addEventListener('animationend', () => {
+        heart.remove();
+    });
+
+}
+```
+
+Ook heb ik een kleine functie geschreven die zegt dat het hartje op een random tijd mag vallen. 
+```javascript
+function scheduleHeart() {
+
+    const randomTime = Math.random() * 4000 + 6000;
+
+    heartTimeout = setTimeout(heartLoop, randomTime);
+}
+```
+
+Nu is het de bedoeling dat je het hartje kan pakken, en dat er dan een extra leven bijkomt, maar dat kan alleen als de ballon groot is. 
+
+Daarom heb ik weer een botsing logica gemaakt, de meeste logica van de vogel heb ik kunnen gerbruiken, maar er is 1 groot verschil, de logica werkt alleen als de ballon groot is. 
+
+```javascript
+function checkHeartCollision() {
+
+    if (currentMode !== "grow") return;
+
+    const balloonRect = balloon.getBoundingClientRect();
+    const hearts = document.querySelectorAll('.heart');
+
+    hearts.forEach(heart => {
+
+        const heartRect = heart.getBoundingClientRect();
+
+        if (
+            heartRect.left < balloonRect.right &&
+            heartRect.right > balloonRect.left &&
+            heartRect.top < balloonRect.bottom &&
+            heartRect.bottom > balloonRect.top
+        ) {
+
+            if (lives < 3) {
+                lives++;
+                updateLivesUI();
+            }
+
+            heart.remove();
+        }
+
+    });
+}
+```
+## Shield -> Ballon kleiner
+Nu wil ik logica maken dat als de ballon kleiner is, en je botst tegen een schild, dat je voor 8 seconden geen bostsingen kunt hebben.
+Ik heb weer veel logica kunnen gebruiken van de botsing, nu was het verschil dat de ballon klein moest zijn om het schild te kunnen pakken, en dat je dan geen botsingen hebt voor 8 seconden. Ook heb ik visueel toegevoegd dat je beschermd bent.
+
+Eerst heb ik een functie geschreven die shields gaat spawnen, dit is eigenlijk deelfde code als de hartjes, behalve dat ze een andere svg hebben.
+
+```javascript
+// shield
+const shieldContainer = document.createElement('div');
+let shieldTimeout;
+let shieldActive = false;
+
+function spawnShield() {
+
+    const shield = document.createElement('div');
+    shield.classList.add('shield');
+
+    shield.style.left = Math.random() * 90 + "vw";
+
+    shield.innerHTML = `
+<svg viewBox="0 0 24 24">
+<path fill="#41416e" d="M20.237,6.289C17.142,5.256,13.36,3.3,12.55,2.474a.748.748,0,0,0-.529-.224.82.82,0,0,0-.532.216A20.312,20.312,0,0,1,3.8,6.409a.749.749,0,0,0-.546.721c0,8.232,1.279,12.515,8.545,14.591a.746.746,0,0,0,.412,0C19.517,19.632,20.75,15.492,20.75,7A.75.75,0,0,0,20.237,6.289Z"/>
+</svg>
+`;
+
+    gameArea.appendChild(shield);
+
+    shield.addEventListener('animationend', () => {
+        shield.remove();
+    });
+
+}
+```
+
+Dan heb ik ook weer een functie gemaakt om de shields te laten spawnen op een random tijdstip, ook deze code is gelijk aan de hartjes code.
+
+```javascript
+function scheduleShield() {
+
+    const randomTime = Math.random() * 8000 + 12000;
+
+    shieldTimeout = setTimeout(shieldLoop, randomTime);
+}
+```
+
+Ook de shield collision is dezelfde code, met uitzondering dat de ballon nu op shrink moet staan.
+
+```javascript
+function checkHeartCollision() {
+
+    if (currentMode !== "grow") return;
+
+    const balloonRect = balloon.getBoundingClientRect();
+    const hearts = document.querySelectorAll('.heart');
+
+    hearts.forEach(heart => {
+
+        const heartRect = heart.getBoundingClientRect();
+
+        if (
+            heartRect.left < balloonRect.right &&
+            heartRect.right > balloonRect.left &&
+            heartRect.top < balloonRect.bottom &&
+            heartRect.bottom > balloonRect.top
+        ) {
+
+            if (lives < 3) {
+                lives++;
+                updateLivesUI();
+            }
+
+            heart.remove();
+        }
+
+    });
+}
+```
+
+Daarna heb ik de spawnbird functie een klein beetje moeten aanpassen met de logica van de shield. Als het shield active is, word er geen botsing herkend.
+```javascript
+                // shield
+                if (shieldActive) {
+                    bird.remove();
+                    birdExists = false;
+                    return;
+                }
+```
+
+Ook heb ik nog een functie toegoegd die visueel een pulsering geeft rond de ballon, zodat het duidelijk is dat je beschermd bent. Ik wist niet zo goed hoe ik dit moest aanpakken, dus heb ik dit aan ai gevraagd.
+
+### Ai
+#### Prompt
+hey, I want to create a visual shield around the balloon if the shield function is active. I want to do this mostly with css. How do I approach this?
+
+#### Antwoord
+Ayy yessss, we can make it clear that the balloon is temporarily protected by giving it a glowy shield effect while shieldActive is true. You can do that entirely via CSS and an extra class. Here's how to add that cleverly:
+
+```javascript
+.balloon.shielded {
+  box-shadow: 0 0 20px 10px rgba(65, 65, 110, 0.7);
+  transition: box-shadow 0.3s ease-in-out;
+  border-radius: 50%;
+}
+```
+- box-shadow creates a blue/purple glow around the balloon.
+
+- transition ensures smooth fade in/out.
+
+- border-radius: 50% keeps it round when enlarging/reducing.
+
+Modify JS in activateShield()
+
+You want to add and remove the class when shield is active:
+
+```javascript
+function activateShield() {
+    shieldActive = true;
+    balloon.classList.add('shielded'); // <-- show visual shield
+
+    setTimeout(() => {
+        shieldActive = false;
+        balloon.classList.remove('shielded'); // <-- hide visual shield
+    }, 8000);
+}
+```
+
+#### Reflectie
+De functionaliteit heeft ai goed kunnen oplossen, ik wou graag dat de meeste styling in css gebeurde en dit is goed gelukt. Wat ik wel nog zie is dat de shield nog niet echt game waardig is. Ik heb zelf een after class toegoegd zodat ik wat emeer controle heb over de vorm van de shield.
+
+Ik heb aan Copilot gevraagd of hij de shield visueel wat intressanter kon maken, zodat het wat meer leek op een echte game. Hij heeft een leuke css animatie toegevoegd die pulseerd.
+
+```javascript
+.balloon.shielded::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 120%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+
+    box-shadow:
+        0 0 25px 12px rgba(80, 120, 255, 0.6),
+        inset 0 0 20px rgba(255, 255, 255, 0.4);
+
+    animation: shieldPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes shieldPulse {
+    0% {
+        box-shadow:
+            0 0 25px 12px rgba(80, 120, 255, 0.6),
+            inset 0 0 20px rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        box-shadow:
+            0 0 35px 18px rgba(120, 160, 255, 0.8),
+            inset 0 0 25px rgba(255, 255, 255, 0.5);
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    100% {
+        box-shadow:
+            0 0 25px 12px rgba(80, 120, 255, 0.6),
+            inset 0 0 20px rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+```
+
+
+
 ## Onboarding
 
 

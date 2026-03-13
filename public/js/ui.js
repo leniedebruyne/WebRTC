@@ -39,6 +39,8 @@ let currentMode = "normal";
 
 
 
+
+
 // wolken functie
 function spawnCloud() {
     if (!cloudContainer) {
@@ -150,6 +152,15 @@ function spawnBird() {
                 birdRect.top < balloonRect.bottom &&
                 birdRect.bottom > balloonRect.top
             ) {
+
+                // shield
+                if (shieldActive) {
+                    bird.remove();
+                    birdExists = false;
+                    return;
+                }
+
+
                 console.log("Botsing gedetecteerd!");
                 bird.remove();
                 birdExists = false;
@@ -340,6 +351,9 @@ function resetGame() {
 
     timeEl.textContent = "Time: 00:00";
 
+    clearTimeout(heartTimeout);
+    scheduleHeart();
+
     if (peer && peer.connected) {
         peer.send(JSON.stringify({ type: "resetBoosts" }));
     }
@@ -373,6 +387,11 @@ function endGame() {
 function initGame() {
     updateBestTimeUI();
     updateLivesUI();
+
+    scheduleHeart();
+    scheduleShield();
+
+    heartCollisionLoop();
 }
 
 
