@@ -3204,6 +3204,100 @@ Ik heb aan Copilot gevraagd of hij de shield visueel wat intressanter kon maken,
 
 
 ## Onboarding
+Ik was lang aan het twijfelen hoe ik mijn onboarding zou aanpakken, ik was aan het denken over textuele uitleg, foto's, ... maar uiteindelijk ben ik voor een animatie gegaan. Ik heb dit gekozen voor de user ux, omdat gebruikers zo niet een hele tekst moeten lezen voor ze het kunnen gebruiken. Ze kunnen de kleine tutorial bekijken en dan begrijpen ze hoe het spel werkt.
+
+Ik heb deze stappen in mijn onboarding video verwerkt:
+1. Swipen om de ballon te bewegen.
+2. Tikken om de ballon groter te maken en om extra levens te pakken.
+3. Tikken om de ballon kleiner te maken en om een bescherming te pakken.
+4. Telefoon schudden om een boost te krijgen.
+
+Deze onboarding heb ik boven mijn qr code geplaatst. Ook heb ik nog wat styling toegevoegd voor deze pagina. Dit is de html, met de video er in en een extra div voor styling.
+
+```javascript
+    <div id="qrContainer">
+        <p id="status">Scan QR code met je gsm</p>
+
+        <div class="qr-card">
+            <video class="onboarding-video" autoplay muted loop playsinline>
+                <source src="/assets/Onboarding.mp4" type="video/mp4">
+            </video>
+
+            <div id="qr"></div>
+        </div>
+
+        <a id="url" target="_blank"></a>
+    </div>
+```
+
+En dit is de css met extra styling.
+
+```javascript
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: linear-gradient(to top, #65A9E7, #D7ECFE);
+    font-family: 'Arial', sans-serif;
+}
+
+#qrContainer {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to top, #65A9E7, #D7ECFE);
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+}
+
+.qr-card {
+    display: flex;
+    gap: 40px;
+    padding: 40px 50px;
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    align-items: center;
+}
+
+#status {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #204062;
+    margin-bottom: 40px;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.onboarding-video {
+    width: 650px;
+    max-width: 60vw;
+    border-radius: 16px;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+#qr {
+    padding: 16px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+#url {
+    opacity: 0;
+}
+```
+
+
+
+
 
 
 

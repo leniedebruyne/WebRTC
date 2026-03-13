@@ -11,7 +11,15 @@
 <body>
     <div id="qrContainer">
         <p id="status">Scan QR code met je gsm</p>
-        <div id="qr"></div>
+
+        <div class="qr-card">
+            <video class="onboarding-video" autoplay muted loop playsinline>
+                <source src="/assets/Onboarding.mp4" type="video/mp4">
+            </video>
+
+            <div id="qr"></div>
+        </div>
+
         <a id="url" target="_blank"></a>
     </div>
 
@@ -43,7 +51,7 @@
 
     <!-- <script type="module" src="/js/desktop.js"></script> -->
     <script src="/js/desktop.js"></script>
-    
+
     <script src="/js/collectibles.js"></script>
 
 
