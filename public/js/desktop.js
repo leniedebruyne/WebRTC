@@ -138,7 +138,7 @@ function resetToQR() {
     balloon.style.top = `${window.innerHeight / 2 - balloon.offsetHeight / 2}px`;
 
     $qrContainer.style.display = "flex";
-    $status.textContent = "Scan QR code met je gsm";
+    $status.textContent = "Scan the QR code with your cell phone";
 
     if (peer) {
         peer.destroy();

@@ -21,7 +21,7 @@ if (enableMotionBtn) {
 
             const res = await DeviceMotionEvent.requestPermission();
             if (res !== "granted") {
-                alert("Motion permission is nodig om te shakken!");
+                alert("Motion permission is required to shake!");
                 return;
             }
         }

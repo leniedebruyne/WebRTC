@@ -9,14 +9,14 @@ const speedPillsDesktop = document.querySelectorAll('.status-pill-desktop[data-s
 
 const DESKTOP_STATUS_LABELS = {
     size: {
-        small: 'Klein',
-        medium: 'Middelmatig',
-        large: 'Groot'
+        small: 'Small',
+        medium: 'Medium',
+        large: 'Large'
     },
     speed: {
-        slow: 'Traag',
-        medium: 'Middel',
-        fast: 'Snel'
+        slow: 'Slow',
+        medium: 'Medium',
+        fast: 'Fast'
     }
 };
 
@@ -60,7 +60,7 @@ function renderDesktopStatus() {
     updateStatusPillsDesktop(speedPillsDesktop, displayedSpeed, 'speed');
 
     if (boostStateDesktopEl) {
-        boostStateDesktopEl.textContent = boostStatusActive ? 'Boost actief' : 'Boost uit';
+        boostStateDesktopEl.textContent = boostStatusActive ? 'Boost active' : 'Boost inactive';
         boostStateDesktopEl.classList.toggle('is-active', boostStatusActive);
     }
 }
