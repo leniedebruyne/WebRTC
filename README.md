@@ -3524,6 +3524,22 @@ window.addEventListener('boostStateChange', (event) => {
 ### Reflectie
 Ai heeft dit stuk eigenlijk helemaal voor mij geschreven, behalve de index file dan. Wel heb ik de logica van de ui in een appart sidebar.js bestand gestopt, zodat ik deze logica nog eens kan bekijken en aanpassen waar nodig. 
 
+## Planning week 4
+Voor volgende week wil ik graag de finishing toutches aan mijn game geven. Er zijn een paar kleine bugs zoals de bosting met de ballon en vogel die niet smooth gebeuren of de ballon die een beetje hapert. Deze zal ik nog proberen oplossen. Ook de feedback van het volgende consult zal ik nog meenemen.
+
+### Wat heb ik in week 3 gedaan?
+In week 3 heb ik ervoor gezorgt dat mijn game wat meer waarde kreeg. 
+- Ik heb ervoor gezorgt dat je de ballon groter moest maken om hartjes te kunnen vangen en kleiner voor een schild. 
+- Ook heb ik de onboarding aan mijn spel toegevoegd op het qr code spel zodat het duidelijk was hoe het spel in zijn werg ging.
+- Ook heb ik een ui kader gemaakt die toont hoe snel en hoe groot je ballon is.
+
+## Consult 3
+In dit consult hebben we de finishing toutches besproken. Dit zijn de dingen die ik nog zal veranderen:
+- Het is beter om de ballon status visueel weer te geven.
+- Ook heb ik mijn probeersels van functie exports getoont die niet lukten, we hebben bekeken hoe ik dit beter kan aanpakken. Dit zal ik nog verweken in mijn code.
+
+
+
 
 
 

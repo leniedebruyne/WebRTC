@@ -1,4 +1,6 @@
 /* client code, gsm */
+import { resetBoosts } from './shake.js';
+
 // socket
 const socket = io();
 const desktopId = new URLSearchParams(window.location.search).get('id');
@@ -48,6 +50,18 @@ peer.on('connect', () => {
 // Wanneer desktop disconnect
 window.addEventListener('beforeunload', () => {
     socket.emit('controllerDisconnected', desktopId);
+});
+
+window.addEventListener('motionPermissionGranted', () => {
+    if (peer.connected) {
+        peer.send(JSON.stringify({ type: 'motionReady' }));
+    }
+});
+
+window.addEventListener('controllerShake', () => {
+    if (peer.connected) {
+        peer.send(JSON.stringify({ type: 'shake' }));
+    }
 });
 
 // reset
@@ -134,20 +148,3 @@ function handleShrinkClick() {
         peer.send(JSON.stringify({ type: 'shrink' }));
     }
 }
-
-
-
-// reset
-function resetBoosts() {
-    boostsLeft = 3;
-    updateBoostUI();
-}
-
-
-/* export default function resetBoosts() {
-    boostsLeft = 3;
-    updateBoostUI();
-} */
-
-// bij deze functie gebruik ik window omdat hij anders faalt bij de peer
-window.resetBoosts = resetBoosts;

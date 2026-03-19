@@ -20,7 +20,7 @@ const DESKTOP_STATUS_LABELS = {
     }
 };
 
-const desktopStatus = {
+export const desktopStatus = {
     size: 'medium',
     speed: 'medium'
 };
@@ -45,7 +45,7 @@ function getDisplayedSpeedDesktop() {
     return order[Math.min(baseIndex + 1, order.length - 1)];
 }
 
-function renderDesktopStatus() {
+export function renderDesktopStatus() {
     const displayedSpeed = getDisplayedSpeedDesktop();
 
     if (sizeValueDesktopEl) {

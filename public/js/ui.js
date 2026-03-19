@@ -1,10 +1,11 @@
-// import
-/* import resetBoosts from '/js/controller.js'; */
+import { renderDesktopStatus, desktopStatus } from './sidebar.js';
+import { scheduleHeart, scheduleShield, heartCollisionLoop, restartHeartSchedule, isShieldActive } from './collectibles.js';
 
 // wolken
 const cloudContainer = document.querySelector('.clouds');
 const maxClouds = 4;
 const cloud = document.createElement('div');
+const balloon = document.querySelector('.balloon');
 
 // time
 let startTime = null;
@@ -35,11 +36,12 @@ let bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
 // grow
 let balloonScale = 1;
 let speedMultiplier = 1;
+let currentMode = "normal";
 
 
 
 // wolken functie
-function spawnCloud() {
+export function spawnCloud() {
     if (!cloudContainer) {
         return;
     }
@@ -69,7 +71,7 @@ function spawnCloud() {
 }
 
 // Elke 2–4 seconden een nieuwe wolk proberen spawnen
-function startClouds() {
+export function startClouds() {
     if (!cloudContainer) {
         return;
     }
@@ -90,7 +92,7 @@ function formatTime(ms) {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-function startTimer() {
+export function startTimer() {
     lastTick = Date.now();
 
     function updateTimer() {
@@ -151,7 +153,7 @@ function spawnBird() {
             ) {
 
                 // shield
-                if (shieldActive) {
+                if (isShieldActive()) {
                     bird.remove();
                     birdExists = false;
                     return;
@@ -251,7 +253,7 @@ function updateBestTimeUI() {
 
 
 // grow
-function activateGrow() {
+export function activateGrow() {
     if (currentMode === "grow") {
         setNormalMode();
         return;
@@ -264,13 +266,14 @@ function activateGrow() {
 
     desktopStatus.size = 'large';
     desktopStatus.speed = 'slow';
+    window.dispatchEvent(new CustomEvent('modeChange', { detail: { mode: currentMode } }));
     renderDesktopStatus();
 }
 
 
 
 // shrink
-function activateShrink() {
+export function activateShrink() {
     if (currentMode === "shrink") {
         setNormalMode();
         return;
@@ -283,6 +286,7 @@ function activateShrink() {
 
     desktopStatus.size = 'small';
     desktopStatus.speed = 'fast';
+    window.dispatchEvent(new CustomEvent('modeChange', { detail: { mode: currentMode } }));
     renderDesktopStatus();
 }
 
@@ -297,8 +301,39 @@ function setNormalMode() {
 
     desktopStatus.size = 'medium';
     desktopStatus.speed = 'medium';
+    window.dispatchEvent(new CustomEvent('modeChange', { detail: { mode: currentMode } }));
     renderDesktopStatus();
 }
+
+
+export function activateBoost() {
+    if (activateBoost.isActive) return;
+
+    activateBoost.isActive = true;
+    window.dispatchEvent(new CustomEvent('boostStateChange', { detail: { active: true } }));
+
+    const oldMultiplier = speedMultiplier;
+
+    speedMultiplier = 5;
+    timeMultiplier = 5;
+
+    for (let i = 0; i < 3; i++) {
+        spawnCloud();
+    }
+
+    function endBoost() {
+        speedMultiplier = oldMultiplier;
+        timeMultiplier = 1;
+        elapsedTime += 2000;
+
+        activateBoost.isActive = false;
+        window.dispatchEvent(new CustomEvent('boostStateChange', { detail: { active: false } }));
+    }
+
+    setTimeout(endBoost, 3000);
+}
+
+activateBoost.isActive = false;
 
 
 
@@ -342,7 +377,7 @@ function startCountdown() {
 
 
 // reset
-function resetGame() {
+export function resetGame() {
 
     lives = 3;
     updateLivesUI();
@@ -360,13 +395,9 @@ function resetGame() {
 
     timeEl.textContent = "Time: 00:00";
 
-    clearTimeout(heartTimeout);
-    scheduleHeart();
+    restartHeartSchedule();
 
-    if (peer && peer.connected) {
-        peer.send(JSON.stringify({ type: "resetBoosts" }));
-    }
-    /* resetBoosts(); */
+    window.dispatchEvent(new Event('requestResetBoosts'));
 }
 
 
@@ -403,6 +434,13 @@ function initGame() {
 
     heartCollisionLoop();
 }
+
+window.addEventListener('heartCollected', () => {
+    if (lives < 3) {
+        lives++;
+        updateLivesUI();
+    }
+});
 
 
 initGame();

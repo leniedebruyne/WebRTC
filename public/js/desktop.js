@@ -1,16 +1,17 @@
 /* client code, desktop */
+import { startClouds, resetGame, startTimer, activateGrow, activateShrink, activateBoost } from './ui.js';
 
 // socket en peer
 const socket = io();
 const $url = document.getElementById('url');
 const $status = document.getElementById('status');
 const $qrContainer = document.getElementById('qrContainer');
-let peer = null;
+export let peer = null;
 let cursor = null;
 let currentControllerId = null;
 
 // ballon
-const balloon = document.querySelector('.balloon');
+export const balloon = document.querySelector('.balloon');
 
 // reset
 const gameDiv = document.querySelector('.game');
@@ -76,7 +77,7 @@ socket.on('signal', ({ senderId, signal }) => {
             if (message.type === "shake") {
                 console.log("SHAKE ontvangen van controller");
 
-                window.dispatchEvent(new Event("boost"));
+                activateBoost();
             }
 
             if (message.type === 'move') {
@@ -95,7 +96,7 @@ socket.on('signal', ({ senderId, signal }) => {
         });
 
         socket.on('peerDisconnected', () => {
-            resetToQR(); 
+            resetToQR();
         });
 
         peer.on('connect', () => {
@@ -145,3 +146,9 @@ function resetToQR() {
         peer = null;
     }
 }
+
+window.addEventListener('requestResetBoosts', () => {
+    if (peer && peer.connected) {
+        peer.send(JSON.stringify({ type: "resetBoosts" }));
+    }
+});

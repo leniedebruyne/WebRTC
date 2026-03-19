@@ -6,6 +6,13 @@ let heartTimeout;
 const shieldContainer = document.createElement('div');
 let shieldTimeout;
 let shieldActive = false;
+let currentMode = "normal";
+const gameArea = document.querySelector('.game');
+const balloon = document.querySelector('.balloon');
+
+window.addEventListener('modeChange', (event) => {
+    currentMode = event.detail?.mode || "normal";
+});
 
 
 // Power hartjes
@@ -34,7 +41,7 @@ function heartLoop() {
     scheduleHeart();
 }
 
-function scheduleHeart() {
+export function scheduleHeart() {
 
     const randomTime = Math.random() * 8000 + 12000;
 
@@ -45,6 +52,7 @@ function scheduleHeart() {
 function checkHeartCollision() {
 
     if (currentMode !== "grow") return;
+    if (!balloon) return;
 
     const balloonRect = balloon.getBoundingClientRect();
     const hearts = document.querySelectorAll('.heart');
@@ -60,10 +68,7 @@ function checkHeartCollision() {
             heartRect.bottom > balloonRect.top
         ) {
 
-            if (lives < 3) {
-                lives++;
-                updateLivesUI();
-            }
+            window.dispatchEvent(new Event('heartCollected'));
 
             heart.remove();
         }
@@ -71,7 +76,7 @@ function checkHeartCollision() {
     });
 }
 
-function heartCollisionLoop() {
+export function heartCollisionLoop() {
     checkHeartCollision();
     checkShieldCollision();
 
@@ -105,7 +110,7 @@ function shieldLoop() {
     scheduleShield();
 }
 
-function scheduleShield() {
+export function scheduleShield() {
 
     const randomTime = Math.random() * 8000 + 12000;
 
@@ -115,6 +120,7 @@ function scheduleShield() {
 function checkShieldCollision() {
 
     if (currentMode !== "shrink") return;
+    if (!balloon) return;
 
     const balloonRect = balloon.getBoundingClientRect();
     const shields = document.querySelectorAll('.shield');
@@ -139,10 +145,19 @@ function checkShieldCollision() {
 
 function activateShield() {
     shieldActive = true;
-    balloon.classList.add('shielded'); // <-- show visual shield
+    balloon.classList.add('shielded');
 
     setTimeout(() => {
         shieldActive = false;
-        balloon.classList.remove('shielded'); // <-- hide visual shield
+        balloon.classList.remove('shielded');
     }, 8000);
+}
+
+export function restartHeartSchedule() {
+    clearTimeout(heartTimeout);
+    scheduleHeart();
+}
+
+export function isShieldActive() {
+    return shieldActive;
 }

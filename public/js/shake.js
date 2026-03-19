@@ -40,9 +40,7 @@ if (enableMotionBtn) {
         startShakeDetection();
         permissionScreen.style.display = "none";
 
-        if (peer && peer.connected) {
-            peer.send(JSON.stringify({ type: "motionReady" }));
-        }
+        window.dispatchEvent(new Event("motionPermissionGranted"));
     });
 }
 
@@ -61,10 +59,8 @@ function startShakeDetection() {
             if (now - lastShake > 800) {
                 lastShake = now;
 
-                if (boostsLeft > 0 && peer && peer.connected) {
-                    boostsLeft--;
-                    updateBoostUI();
-                    peer.send(JSON.stringify({ type: "shake" }));
+                if (consumeBoost()) {
+                    window.dispatchEvent(new Event("controllerShake"));
                 } else {
                     sound.currentTime = 0;
                     sound.play().catch(err => {
@@ -72,6 +68,17 @@ function startShakeDetection() {
                     });
                 }
             }
+
+            function consumeBoost() {
+                if (boostsLeft <= 0) {
+                    return false;
+                }
+
+                boostsLeft--;
+                updateBoostUI();
+                return true;
+            }
+
         }
     });
 }
@@ -134,6 +141,12 @@ function updateBoostUI() {
 
 
 function initBoost() {
+    updateBoostUI();
+}
+
+
+export function resetBoosts() {
+    boostsLeft = 3;
     updateBoostUI();
 }
 
