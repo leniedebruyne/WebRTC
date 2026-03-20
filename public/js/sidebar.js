@@ -3,9 +3,30 @@ let boostStatusActive = false;
 
 const sizeValueDesktopEl = document.querySelector('.status-size-value');
 const speedValueDesktopEl = document.querySelector('.status-speed-value');
-const boostStateDesktopEl = document.querySelector('.boost-state-desktop');
-const sizePillsDesktop = document.querySelectorAll('.status-pill-desktop[data-size]');
-const speedPillsDesktop = document.querySelectorAll('.status-pill-desktop[data-speed]');
+
+const gaugeFill = document.querySelector('.gauge-fill');
+const sizeFill = document.querySelector('.size-fill');
+
+const boostSwitch = document.querySelector('.boost-switch');
+const boostLabel = document.querySelector('.boost-label');
+
+function getSpeedRotation(speed) {
+    switch (speed) {
+        case 'slow': return -60;
+        case 'medium': return 0;
+        case 'fast': return 60;
+        default: return 0;
+    }
+}
+
+function getSizeHeight(size) {
+    switch (size) {
+        case 'small': return 30;
+        case 'medium': return 60;
+        case 'large': return 100;
+        default: return 60;
+    }
+}
 
 const DESKTOP_STATUS_LABELS = {
     size: {
@@ -26,14 +47,6 @@ export const desktopStatus = {
 };
 
 
-
-function updateStatusPillsDesktop(pills, activeValue, key) {
-    pills.forEach((pill) => {
-        const isActive = pill.dataset[key] === activeValue;
-        pill.classList.toggle('is-active', isActive);
-    });
-}
-
 function getDisplayedSpeedDesktop() {
     const order = ['slow', 'medium', 'fast'];
     const baseIndex = order.indexOf(desktopStatus.speed);
@@ -48,6 +61,17 @@ function getDisplayedSpeedDesktop() {
 export function renderDesktopStatus() {
     const displayedSpeed = getDisplayedSpeedDesktop();
 
+    if (gaugeFill) {
+        const rotation = getSpeedRotation(displayedSpeed);
+        gaugeFill.style.transform = `rotate(${rotation}deg)`;
+    }
+
+    if (sizeFill) {
+        const height = getSizeHeight(desktopStatus.size);
+        sizeFill.style.height = `${height}%`;
+    }
+
+    // text labels
     if (sizeValueDesktopEl) {
         sizeValueDesktopEl.textContent = DESKTOP_STATUS_LABELS.size[desktopStatus.size];
     }
@@ -56,16 +80,20 @@ export function renderDesktopStatus() {
         speedValueDesktopEl.textContent = DESKTOP_STATUS_LABELS.speed[displayedSpeed];
     }
 
-    updateStatusPillsDesktop(sizePillsDesktop, desktopStatus.size, 'size');
-    updateStatusPillsDesktop(speedPillsDesktop, displayedSpeed, 'speed');
 
-    if (boostStateDesktopEl) {
-        boostStateDesktopEl.textContent = boostStatusActive ? 'Boost active' : 'Boost inactive';
-        boostStateDesktopEl.classList.toggle('is-active', boostStatusActive);
+    if (boostSwitch && boostLabel) {
+        boostSwitch.classList.toggle('active', boostStatusActive);
+        boostLabel.textContent = boostStatusActive ? 'Active' : 'Inactive';
     }
 }
 
 window.addEventListener('boostStateChange', (event) => {
-    boostStatusActive = !!event.detail?.active;
+    let isActive = false;
+
+    if (event.detail && event.detail.active) {
+        isActive = true;
+    }
+
+    boostStatusActive = isActive;
     renderDesktopStatus();
 });

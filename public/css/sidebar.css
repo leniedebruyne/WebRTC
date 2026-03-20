@@ -1,0 +1,110 @@
+/* speed */
+.speed-gauge {
+    width: 120px;
+    height: 60px;
+    border-radius: 120px 120px 0 0;
+    background: #D7ECFE;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #1f4777;
+    margin: 10px 0;
+}
+
+.gauge-fill {
+    width: 200%;
+    height: 200%;
+    position: absolute;
+    bottom: -100%;
+    left: -50%;
+    background: conic-gradient(#65A9E7 0deg,
+            #4174AC 120deg,
+            #1f4777 240deg);
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: transform 0.4s ease;
+}
+
+
+/* size */
+.size-indicator {
+    width: 60px;
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.size-bar {
+    width: 20px;
+    height: 100%;
+    background: #D7ECFE;
+    border: 2px solid #1f4777;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.size-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to top,
+            #4174AC,
+            #65A9E7);
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    transition: height 0.3s ease;
+}
+
+.status-label-desktop {
+    margin-bottom: 12px;
+}
+
+
+
+/* boost */
+.boost-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.boost-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.boost-switch {
+    width: 50px;
+    height: 26px;
+    background: #D7ECFE;
+    border: 2px solid #1f4777;
+    border-radius: 20px;
+
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    position: relative;
+    transition: background 0.3s ease;
+}
+
+.boost-knob {
+    width: 18px;
+    height: 18px;
+    background: #1f4777;
+    border-radius: 50%;
+    transition: margin-left 0.3s ease;
+}
+
+
+.boost-switch.active .boost-knob {
+    margin-left: auto;
+}
+
+.boost-label {
+    font-size: 1rem;
+    color: #1f4777;
+}

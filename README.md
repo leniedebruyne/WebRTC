@@ -3538,14 +3538,249 @@ In dit consult hebben we de finishing toutches besproken. Dit zijn de dingen die
 - Het is beter om de ballon status visueel weer te geven.
 - Ook heb ik mijn probeersels van functie exports getoont die niet lukten, we hebben bekeken hoe ik dit beter kan aanpakken. Dit zal ik nog verweken in mijn code.
 
+## Visuele ui
+Op het consult is er besproken dat het beter was om de gegevens van de ballon visueel weer te geven. Nu staat er een lader langs de zijkant die aangeeft of de ballon "small, medium of large" is en "slow, normal of fast". Op het consult werd er besproken dat het leuk zou zijn om de snelheid met een meter weer te geven. Daar ben ik dus mee begonnen. De grootte zal ik weergeven door een verticale bar die zich vult aan de hand van de groote van de ballon. Ook heb ik besloten om de boost ook visueler te maken, door een toggle.
+
+Ik heb mijn html een beetje moeten aanpassen, ik heb vooral gebruik gemaakt van div's.
 
 
 
+```javascript
+<!-- SIZE -->
+            <div class="status-card-desktop">
+                <p class="status-label-desktop">Size</p>
+
+                <div class="size-indicator">
+                    <div class="size-bar">
+                        <div class="size-fill"></div>
+                    </div>
+                </div>
+
+                <p class="status-value-desktop status-size-value">Medium</p>
+            </div>
+
+
+            <!-- SPEED -->
+            <div class="status-card-desktop">
+                <p class="status-label-desktop">Speed</p>
+
+                <div class="speed-gauge">
+                    <div class="gauge-fill"></div>
+                </div>
+
+                <p class="status-value-desktop status-speed-value">Medium</p>
+            </div>
+
+            <!-- BOOST -->
+            <div class="status-card-desktop boost-card">
+                <p class="status-label-desktop">Boost</p>
+            
+                <div class="boost-toggle">
+                    <div class="boost-switch">
+                        <div class="boost-knob"></div>
+                    </div>
+                    <span class="boost-label">Inactive</span>
+                </div>
+            </div>
+
+```
+
+Deze heb ik dan visueel gemaakt met css. Hiervoor heb ik een beetje hulp gevraagd aan ai, omdat ik graag in css alles wou tekenen. Dit kwam uit het resultaat:
 
 
 
+```javascript
+/* speed */
+.speed-gauge {
+    width: 120px;
+    height: 60px;
+    border-radius: 120px 120px 0 0;
+    background: #D7ECFE;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #1f4777;
+    margin: 10px 0;
+}
+
+.gauge-fill {
+    width: 200%;
+    height: 200%;
+    position: absolute;
+    bottom: -100%;
+    left: -50%;
+    background: conic-gradient(#65A9E7 0deg,
+            #4174AC 120deg,
+            #1f4777 240deg);
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: transform 0.4s ease;
+}
 
 
+/* size */
+.size-indicator {
+    width: 60px;
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.size-bar {
+    width: 20px;
+    height: 100%;
+    background: #D7ECFE;
+    border: 2px solid #1f4777;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.size-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to top,
+            #4174AC,
+            #65A9E7);
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    transition: height 0.3s ease;
+}
+
+.status-label-desktop {
+    margin-bottom: 12px;
+}
+
+
+
+/* boost */
+.boost-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.boost-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.boost-switch {
+    width: 50px;
+    height: 26px;
+    background: #D7ECFE;
+    border: 2px solid #1f4777;
+    border-radius: 20px;
+
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    position: relative;
+    transition: background 0.3s ease;
+}
+
+.boost-knob {
+    width: 18px;
+    height: 18px;
+    background: #1f4777;
+    border-radius: 50%;
+    transition: margin-left 0.3s ease;
+}
+
+
+.boost-switch.active .boost-knob {
+    margin-left: auto;
+}
+
+.boost-label {
+    font-size: 1rem;
+    color: #1f4777;
+}
+
+```
+
+Als laatste heb ik de logica van de woorden weg gedaan, deze had ik namelijk niet meer nodig. Wat ik heb toegevoegd zijn gewoon de variabelen van de speed, size en boost:
+
+```javascript
+const sizeValueDesktopEl = document.querySelector('.status-size-value');
+const speedValueDesktopEl = document.querySelector('.status-speed-value');
+```
+
+En dan ben ik begonnen met de logica voor de speed meter. Ik heb ervoor gezorgt dat de woorden zoals slow, medium, fast, ... wordt omgezet naar getallen. Zo kan ik deze getallen gebruiken in de rotatie van de meter.
+
+```javascript
+function getSpeedRotation(speed) {
+    switch (speed) {
+        case 'slow': return -60;
+        case 'medium': return 0;
+        case 'fast': return 60;
+        default: return 0;
+    }
+}
+
+
+```
+
+Daarna heb ik de logica toegepast dat als er een element is om te roteren, dan haalt de functie de rotatiehoek op via getSpeedRotation en past daarna het CSS rotate toe.
+
+
+```javascript
+    if (gaugeFill) {
+        const rotation = getSpeedRotation(displayedSpeed);
+        gaugeFill.style.transform = `rotate(${rotation}deg)`;
+    }
+
+```
+
+Voor de size indicator logica heb ik net hetzelfde gedaan maar dan voor de size van de ballon.
+
+
+```javascript
+const sizeFill = document.querySelector('.size-fill');
+
+```
+
+```javascript
+function getSizeHeight(size) {
+    switch (size) {
+        case 'small': return 30;
+        case 'medium': return 60;
+        case 'large': return 100;
+        default: return 60;
+    }
+}
+
+```
+
+
+```javascript
+    if (sizeFill) {
+        const height = getSizeHeight(desktopStatus.size);
+        sizeFill.style.height = `${height}%`;
+    }
+```
+
+Voor de boost logica heb ik gewoon gezorgt voor een toggle knop die aan of uit staat.
+
+```javascript
+const boostSwitch = document.querySelector('.boost-switch');
+const boostLabel = document.querySelector('.boost-label');
+```
+
+
+```javascript
+    if (boostSwitch && boostLabel) {
+        boostSwitch.classList.toggle('active', boostStatusActive);
+        boostLabel.textContent = boostStatusActive ? 'Active' : 'Inactive';
+    }
+```
+
+## Code opkuisen
+Daarna heb ik er mijn werk van gemaakt om alle code eens goed te doorlopen en op te kuisen. Ik heb 
 
 
 

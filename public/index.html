@@ -6,6 +6,8 @@
 <head>
     <title>WebRTC Desktop</title>
     <link rel="stylesheet" href="/css/desktop.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+
 </head>
 
 <body>
@@ -36,26 +38,44 @@
         </div>
 
         <aside class="status-sidebar-desktop">
+
+            <!-- SIZE -->
             <div class="status-card-desktop">
                 <p class="status-label-desktop">Size</p>
+
+                <div class="size-indicator">
+                    <div class="size-bar">
+                        <div class="size-fill"></div>
+                    </div>
+                </div>
+
                 <p class="status-value-desktop status-size-value">Medium</p>
-                <div class="status-steps-desktop">
-                    <span class="status-pill-desktop" data-size="small">Small</span>
-                    <span class="status-pill-desktop is-active" data-size="medium">Medium</span>
-                    <span class="status-pill-desktop" data-size="large">Large</span>
+            </div>
+
+
+            <!-- SPEED -->
+            <div class="status-card-desktop">
+                <p class="status-label-desktop">Speed</p>
+
+                <div class="speed-gauge">
+                    <div class="gauge-fill"></div>
+                </div>
+
+                <p class="status-value-desktop status-speed-value">Medium</p>
+            </div>
+
+            <!-- BOOST -->
+            <div class="status-card-desktop boost-card">
+                <p class="status-label-desktop">Boost</p>
+            
+                <div class="boost-toggle">
+                    <div class="boost-switch">
+                        <div class="boost-knob"></div>
+                    </div>
+                    <span class="boost-label">Inactive</span>
                 </div>
             </div>
 
-            <div class="status-card-desktop">
-                <p class="status-label-desktop">Speed</p>
-                <p class="status-value-desktop status-speed-value">Medium</p>
-                <div class="status-steps-desktop">
-                    <span class="status-pill-desktop" data-speed="slow">Slow</span>
-                    <span class="status-pill-desktop is-active" data-speed="medium">Medium</span>
-                    <span class="status-pill-desktop" data-speed="fast">Fast</span>
-                </div>
-                <p class="boost-state-desktop">Turn off Boost</p>
-            </div>
         </aside>
 
         <!-- Wolken-container -->
