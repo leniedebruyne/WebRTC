@@ -1,17 +1,21 @@
 // power hartjes
-const heartContainer = document.querySelector('.hearts');
 let heartTimeout;
 
 // shield
-const shieldContainer = document.createElement('div');
-let shieldTimeout;
-let shieldActive = false;
+ let shieldTimeout
+ let shieldActive = false;
 let currentMode = "normal";
 const gameArea = document.querySelector('.game');
 const balloon = document.querySelector('.balloon');
 
 window.addEventListener('modeChange', (event) => {
-    currentMode = event.detail?.mode || "normal";
+    let mode = "normal";
+
+    if (event.detail && event.detail.mode) {
+        mode = event.detail.mode;
+    }
+
+    currentMode = mode;
 });
 
 

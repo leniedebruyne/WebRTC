@@ -7,7 +7,6 @@ const $url = document.getElementById('url');
 const $status = document.getElementById('status');
 const $qrContainer = document.getElementById('qrContainer');
 export let peer = null;
-let cursor = null;
 let currentControllerId = null;
 
 // ballon
@@ -75,8 +74,6 @@ socket.on('signal', ({ senderId, signal }) => {
             }
 
             if (message.type === "shake") {
-                console.log("SHAKE ontvangen van controller");
-
                 activateBoost();
             }
 

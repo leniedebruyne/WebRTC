@@ -14,7 +14,6 @@ const growBtn = document.querySelector('.grow');
 const shrinkBtn = document.querySelector('.shrink');
 
 // game
-const startScreen = document.getElementById("startScreen");
 let gameStarted = false;
 
 

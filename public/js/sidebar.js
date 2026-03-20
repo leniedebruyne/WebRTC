@@ -1,5 +1,5 @@
-let currentMode = "normal";
-let boostStatusActive = false;
+/* let currentMode = "normal";
+ */let boostStatusActive = false;
 
 const sizeValueDesktopEl = document.querySelector('.status-size-value');
 const speedValueDesktopEl = document.querySelector('.status-speed-value');

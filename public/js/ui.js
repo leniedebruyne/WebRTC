@@ -4,15 +4,14 @@ import { scheduleHeart, scheduleShield, heartCollisionLoop, restartHeartSchedule
 // wolken
 const cloudContainer = document.querySelector('.clouds');
 const maxClouds = 4;
-const cloud = document.createElement('div');
+
+// ballon
 const balloon = document.querySelector('.balloon');
 
 // time
-let startTime = null;
 let timerInterval = null;
 const timeEl = document.querySelector('.time');
 let timeMultiplier = 1;
-let timeOffset = 0;
 let elapsedTime = 0;
 let lastTick = null;
 
@@ -187,7 +186,7 @@ function spawnBird() {
     animate();
 }
 
-const birdInterval = setInterval(spawnBird, 1000);
+const birdInterval = setInterval(spawnBird, 1000); 
 
 
 
@@ -230,7 +229,7 @@ function animate() {
     }
 
     requestAnimationFrame(animate);
-}
+} 
 
 
 
