@@ -18,9 +18,6 @@ let lastTick = null;
 // vogel
 const bird = document.querySelector('.bird'); 
 const gameArea = document.querySelector('.game');
-let direction = 1; 
-let speed = 2; 
-let pos = 0; 
 let birdExists = false;
 
 // levens

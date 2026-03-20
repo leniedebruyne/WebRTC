@@ -3780,7 +3780,14 @@ const boostLabel = document.querySelector('.boost-label');
 ```
 
 ## Code opkuisen
-Daarna heb ik er mijn werk van gemaakt om alle code eens goed te doorlopen en op te kuisen. Ik heb 
+Daarna heb ik er mijn werk van gemaakt om alle code eens goed te doorlopen en op te kuisen. Ik heb alle ongebruikte variabelen weg gedaan en ook heb ik gezien dat ik 2 keer een functie animation had die eigenlijk hetzelfde deed, dus 1 daarvan heb ik weg gedaan. Wat ik wel heb opgemerkt is dat in de ui.js sommige variabelen in het grijs staan, met de tekst "'...' is declared but its value is never read.". Dit vind ik raar want de variabelen worden wel degelijk gebruikt in mijn code. Voor de rest is alles inorde om in te leveren.
+
+## Reflectie
+Ik vond dit een leuke en leerzame opdracht. Het was interessant om te zien hoe weinig code je eigenlijk nodig hebt om een connectie te maken tussen verschillende apparaten en daar informatie tussen door te sturen.
+
+Ook heb ik Copilot leren gebruiken in mijn code. In het begin moest ik hier wel even aan wennen, omdat het mijn code automatisch aanvulde en ik niet meteen doorhad dat je die suggesties ook gewoon kunt weigeren. Toen ik dat eenmaal doorhad, werkte ik er eigenlijk best graag mee.
+
+Daarnaast heb ik mezelf gepusht om eerst zelf na te denken over hoe ik iets zou aanpakken, voordat ik AI om hulp vroeg. Zo kon ik mijn eigen code skills blijven verbeteren.
 
 
 
