@@ -16,11 +16,11 @@ let elapsedTime = 0;
 let lastTick = null;
 
 // vogel
-const bird = document.querySelector('.bird');
+const bird = document.querySelector('.bird'); 
 const gameArea = document.querySelector('.game');
-let direction = 1;
-let speed = 2;
-let pos = 0;
+let direction = 1; 
+let speed = 2; 
+let pos = 0; 
 let birdExists = false;
 
 // levens
@@ -187,50 +187,6 @@ function spawnBird() {
 }
 
 const birdInterval = setInterval(spawnBird, 1000); 
-
-
-
-// levens functie
-function animate() {
-    pos += speed * direction;
-    bird.style.left = pos + 'px';
-
-    // check collision met ballon
-    const birdRect = bird.getBoundingClientRect();
-    const balloonRect = balloon.getBoundingClientRect();
-
-    if (!gameOver) {
-        if (
-            birdRect.left < balloonRect.right &&
-            birdRect.right > balloonRect.left &&
-            birdRect.top < balloonRect.bottom &&
-            birdRect.bottom > balloonRect.top
-        ) {
-            bird.remove();
-            birdExists = false;
-
-            lives--;
-            updateLivesUI();
-
-            if (lives <= 0) {
-                endGame();
-            }
-
-            return;
-        }
-    }
-
-    // check of buiten scherm
-    if ((direction === 1 && pos > window.innerWidth + 60) ||
-        (direction === -1 && pos < -60)) {
-        bird.remove();
-        birdExists = false;
-        return;
-    }
-
-    requestAnimationFrame(animate);
-} 
-
 
 
 // update levens
